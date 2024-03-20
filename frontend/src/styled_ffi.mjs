@@ -47,9 +47,9 @@ function computeProperties(rawProperties, indent = 2) {
 
 export function compileClass(args) {
   const callingClass = getCallingFunction()
-  if (cache[callingClass]) return cache[callingClass].next().value
+  if (cache[callingClass]) return cache[callingClass]
 
-  cache[callingClass] = (function* () {
+  cache[callingClass] = (function () {
     const { lines: cssProperties, medias, classes } = computeProperties(args)
     const wrapClass = (properties, indent) => {
       const baseIndent = idt(indent)
@@ -63,10 +63,10 @@ export function compileClass(args) {
     mediasDef.forEach(def => styleSheet.insertRule(def))
     const finalClasses = `${classes.join(' ')} ${callingClass}`
 
-    while (true) yield finalClasses
+    return finalClasses
   })()
 
-  return cache[callingClass].next().value
+  return cache[callingClass]
 }
 
 export function toString(className) {
