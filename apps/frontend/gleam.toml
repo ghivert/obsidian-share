@@ -11,7 +11,7 @@ typescript_declarations = true
 [dependencies]
 gleam_stdlib = "~> 0.34 or ~> 1.0"
 lustre = "~> 4.0.0-rc.2"
-styled = {path = "../packages/styled"}
+styled = {path = "../../packages/styled"}
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

@@ -1,5 +1,4 @@
 import lustre
-import lustre/attribute
 import lustre/event
 import lustre/effect
 import lustre/element/html
@@ -30,22 +29,18 @@ fn update(model, _msg) {
 }
 
 fn view(model) {
+  let justif = case model % 2 {
+    0 -> justify.Start
+    1 | _ -> justify.End
+  }
   html.div([styled.to_lustre(display())], [
     layout.column([], [html.text(text.please_auth)]),
-    layout.row(
-      [
-        layout.justify(case model % 2 {
-          0 -> justify.Start
-          1 | _ -> justify.End
-        }),
-      ],
-      [
-        html.button([event.on_click(OnClick)], [
-          html.text("Authenticate"),
-          html.text(int.to_string(model)),
-        ]),
-      ],
-    ),
+    layout.row([layout.justify(justif)], [
+      html.button([event.on_click(OnClick)], [
+        html.text("Authenticate"),
+        html.text(int.to_string(model)),
+      ]),
+    ]),
   ])
 }
 
