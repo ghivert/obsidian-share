@@ -7,6 +7,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 import layout/align
 import layout/justify
+import styled.{type Style}
 
 pub opaque type Attributes {
   Direction(String)
@@ -39,15 +40,26 @@ pub fn gap(gap: Int) -> Attributes {
   Gap(gap)
 }
 
-fn reduce_attributes(attributes: Dict(String, String), value: Attributes) {
+fn reduce_attributes(attributes: Dict(String, Style(m, p)), value: Attributes) {
   case value {
-    Direction(direction) -> dict.insert(attributes, "flex-direction", direction)
-    Align(align) -> dict.insert(attributes, "align-items", align)
-    Justify(justify) -> dict.insert(attributes, "justify-content", justify)
+    Direction(direction) ->
+      dict.insert(
+        attributes,
+        "flex-direction",
+        styled.flex_direction(direction),
+      )
+    Align(align) ->
+      dict.insert(attributes, "align-items", styled.align_items(align))
+    Justify(justify) ->
+      dict.insert(
+        attributes,
+        "justify-content",
+        styled.justify_content(justify),
+      )
     Gap(gap) -> {
       let gap_value = int.to_string(gap)
       let gap_style = string.append(gap_value, "px")
-      dict.insert(attributes, "gap", gap_style)
+      dict.insert(attributes, "gap", styled.gap(gap_style))
     }
   }
 }
@@ -58,11 +70,17 @@ fn flex(
   attrs_: List(attribute.Attribute(a)),
   children: List(Element(a)),
 ) {
+  let _ = styled.to_lustre(styled.class([styled.background("red")]))
+  let _2 = styled.to_lustre(styled.class([styled.background("blue")]))
   let attributes_ =
     [Direction(direction), ..attrs]
-    |> list.fold(dict.from_list([#("display", "flex")]), reduce_attributes)
-    |> dict.to_list
-    |> attribute.style
+    |> list.fold(
+      dict.from_list([#("display", styled.display("flex"))]),
+      reduce_attributes,
+    )
+    |> dict.values
+    |> styled.class
+    |> styled.to_lustre
   html.div([attributes_, ..attrs_], children)
 }
 

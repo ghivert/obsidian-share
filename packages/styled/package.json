@@ -1,0 +1,13 @@
+{
+  "name": "styled",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "watch": "nodemon -e gleam --exec 'gleam build'"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0",
+    "prettier": "^3.2.5"
+  }
+}
