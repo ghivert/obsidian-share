@@ -10,7 +10,9 @@ typescript_declarations = true
 
 [dependencies]
 gleam_stdlib = "~> 0.34 or ~> 1.0"
+layout = {path = "../../packages/layout"}
 lustre = "~> 4.0.0-rc.2"
+lustre_http = "~> 0.5"
 styled = {path = "../../packages/styled"}
 
 [dev-dependencies]

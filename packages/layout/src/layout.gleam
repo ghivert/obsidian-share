@@ -40,26 +40,15 @@ pub fn gap(gap: Int) -> Attributes {
   Gap(gap)
 }
 
-fn reduce_attributes(attributes: Dict(String, Style(m, p)), value: Attributes) {
+fn reduce_attributes(attrs: Dict(String, Style(m, p)), value: Attributes) {
   case value {
-    Direction(direction) ->
-      dict.insert(
-        attributes,
-        "flex-direction",
-        styled.flex_direction(direction),
-      )
-    Align(align) ->
-      dict.insert(attributes, "align-items", styled.align_items(align))
-    Justify(justify) ->
-      dict.insert(
-        attributes,
-        "justify-content",
-        styled.justify_content(justify),
-      )
+    Direction(dir) -> dict.insert(attrs, "dir", styled.flex_direction(dir))
+    Align(align) -> dict.insert(attrs, "align", styled.align_items(align))
+    Justify(jstf) -> dict.insert(attrs, "justify", styled.justify_content(jstf))
     Gap(gap) -> {
       let gap_value = int.to_string(gap)
       let gap_style = string.append(gap_value, "px")
-      dict.insert(attributes, "gap", styled.gap(gap_style))
+      dict.insert(attrs, "gap", styled.gap(gap_style))
     }
   }
 }
@@ -70,14 +59,10 @@ fn flex(
   attrs_: List(attribute.Attribute(a)),
   children: List(Element(a)),
 ) {
-  let _ = styled.to_lustre(styled.class([styled.background("red")]))
-  let _2 = styled.to_lustre(styled.class([styled.background("blue")]))
+  let init = dict.from_list([#("display", styled.display("flex"))])
   let attributes_ =
     [Direction(direction), ..attrs]
-    |> list.fold(
-      dict.from_list([#("display", styled.display("flex"))]),
-      reduce_attributes,
-    )
+    |> list.fold(init, reduce_attributes)
     |> dict.values
     |> styled.class
     |> styled.to_lustre
