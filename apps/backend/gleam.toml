@@ -7,6 +7,7 @@ gleam_http = "~> 3.6"
 gleam_json = "~> 1.0"
 gleam_stdlib = "~> 0.34 or ~> 1.0"
 mist = "1.0.0-rc2"
+radiate = {path = "../../packages/gleam-radiate"}
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
