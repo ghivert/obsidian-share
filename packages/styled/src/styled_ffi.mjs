@@ -1,8 +1,8 @@
 const cache = {}
 
 const idt = indent => ' '.repeat(indent)
-let id = 0
-const uniqueId = () => `css-${(id++).toString().padStart(4, '0')}`
+let id_ = 0
+const uniqueId = () => `css-${(id_++).toString().padStart(4, '0')}`
 
 const styleSheet = (() => {
   const styleElement = document.createElement('style')
@@ -14,7 +14,8 @@ const styleSheet = (() => {
 function getCallingFunction() {
   const error = new Error()
   if (!error.stack) throw new Error('Unable to find the stacktrace and to infer the className')
-  return error.stack ?? ''
+  const stack = error.stack ?? ''
+  return stack.split('\n').slice(1, 5).join('\n')
 }
 
 function computeProperties(rawProperties, indent = 2) {
@@ -112,7 +113,7 @@ export function compileClass(args) {
   mediasDef.forEach(def => styleSheet.insertRule(def))
   selectors.forEach(def => styleSheet.insertRule(def))
   const indexRule = styleSheet.insertRule(classDef)
-  const name = `${classes.join(' ')} ${id}`
+  const name = `${classes.join(' ')} ${id}`.trim()
   cache[callingClass] = { name, previousArgs: args, indexRule, memoized: false }
   return { name, callingClass }
 }

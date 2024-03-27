@@ -76,16 +76,18 @@ pub fn offset_position(offset_position: String) { Property("offset-position", of
 pub fn offset_rotate(offset_rotate: String) { Property("offset-rotate", offset_rotate) }
 
 pub fn gap(gap: String) { Property("gap", gap) }
-pub fn gap_area(grid_area: String) { Property("grid-area", grid_area) }
-pub fn gap_column(grid_column: String) { Property("grid-column", grid_column) }
-pub fn gap_row(grid_row: String) { Property("grid-row", grid_row) }
-pub fn gap_template(grid_template: String) { Property("grid-template", grid_template) }
-pub fn gap_auto_columns(grid_auto_columns: String) { Property("grid-auto-columns", grid_auto_columns) }
-pub fn gap_auto_rows(grid_auto_rows: String) { Property("grid-auto-rows", grid_auto_rows) }
-pub fn gap_auto_flow(grid_auto_flow: String) { Property("grid-auto-flow", grid_auto_flow) }
-pub fn gap_template_areas(grid_template_areas: String) { Property("grid-template-areas", grid_template_areas) }
-pub fn gap_template_columns(grid_template_columns: String) { Property("grid-template-columns", grid_template_columns) }
-pub fn gap_template_rows(grid_template_rows: String) { Property("grid-template-rows", grid_template_rows) }
+pub fn column_gap(column_gap: Size) { Property("column-gap", size.to_string(column_gap)) }
+pub fn row_gap(row_gap: Size) { Property("row-gap", size.to_string(row_gap)) }
+pub fn grid_area(grid_area: String) { Property("grid-area", grid_area) }
+pub fn grid_column(grid_column: String) { Property("grid-column", grid_column) }
+pub fn grid_row(grid_row: String) { Property("grid-row", grid_row) }
+pub fn grid_template(grid_template: String) { Property("grid-template", grid_template) }
+pub fn grid_auto_columns(grid_auto_columns: String) { Property("grid-auto-columns", grid_auto_columns) }
+pub fn grid_auto_rows(grid_auto_rows: String) { Property("grid-auto-rows", grid_auto_rows) }
+pub fn grid_auto_flow(grid_auto_flow: String) { Property("grid-auto-flow", grid_auto_flow) }
+pub fn grid_template_areas(grid_template_areas: String) { Property("grid-template-areas", grid_template_areas) }
+pub fn grid_template_columns(grid_template_columns: String) { Property("grid-template-columns", grid_template_columns) }
+pub fn grid_template_rows(grid_template_rows: String) { Property("grid-template-rows", grid_template_rows) }
 
 pub fn align_content(align: String) { Property("align-content", align) }
 pub fn align_items(align: String) { Property("align-items", align) }
