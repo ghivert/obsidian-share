@@ -5,7 +5,7 @@ import styled
 import styled/size.{px, vh}
 import types.{type Model}
 import layout
-import toastify/toast
+import toaster/lustre/toast
 
 pub fn main_layout(_model: Model) {
   html.div([styled.to_lustre(main_styles())], [header(), navbar(), body()])
@@ -62,7 +62,8 @@ fn navbar_styles() {
 }
 
 fn body() {
-  let on_click = event.on_click(types.PerformEffect(toast.info("Clicked")))
+  let on_click =
+    event.on_click(types.PerformEffect(toast.info("This is an info toast")))
   html.nav([styled.to_lustre(body_styles())], [
     html.text("Body"),
     html.button([on_click], [html.text("Click me")]),

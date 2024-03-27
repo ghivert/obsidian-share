@@ -5,10 +5,10 @@ import lustre/effect
 import lustre_http as http
 import layout/main.{main_layout}
 import types
-import toastify
+import toaster
 
 pub fn main() {
-  let assert Ok(_) = toastify.setup()
+  let assert Ok(_) = toaster.setup()
   let assert Ok(_) =
     fn(_) { #(types.init(), effect.none()) }
     |> lustre.application(update, main_layout)

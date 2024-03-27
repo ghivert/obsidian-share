@@ -19,3 +19,8 @@ body {
     --border-color: #333;
   }
 }
+
+@keyframes progress_bar {
+  from { width: 100%; }
+  to { width: 0%; }
+}
