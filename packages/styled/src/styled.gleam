@@ -22,11 +22,17 @@ pub type MediaStyle = Style(NoMedia, PseudoSelector)
 pub type PseudoStyle = Style(NoMedia, NoPseudoSelector)
 
 pub fn width(width: Size) { Property("width", size.to_string(width)) }
+pub fn width_(width: String) { Property("width", width) }
 pub fn max_width(width: Size) { Property("max-width", size.to_string(width)) }
+pub fn max_width_(width: String) { Property("max-width", width) }
 pub fn min_width(width: Size) { Property("min-width", size.to_string(width)) }
+pub fn min_width_(width: String) { Property("min-width", width) }
 pub fn height(height: Size) { Property("height", size.to_string(height)) }
+pub fn height_(height: String) { Property("height", height) }
 pub fn max_height(height: Size) { Property("max-height", size.to_string(height)) }
+pub fn max_height_(height: String) { Property("max-height", height) }
 pub fn min_height(height: Size) { Property("min-height", size.to_string(height)) }
+pub fn min_height_(height: String) { Property("min-height", height) }
 
 pub fn color(color: String) { Property("color", color) }
 pub fn font_family(font_family: String) { Property("font-family", font_family) }
@@ -104,6 +110,14 @@ pub fn place_items(place: String) { Property("place-items", place) }
 pub fn place_self(place: String) { Property("place-self", place) }
 
 pub fn animation(animation: String) { Property("animation", animation) }
+pub fn animation_name(animation: String) { Property("animation-name", animation) }
+pub fn animation_duration(animation: String) { Property("animation-duration", animation) }
+pub fn animation_timing_function(animation: String) { Property("animation-timing-function", animation) }
+pub fn animation_delay(animation: String) { Property("animation-delay", animation) }
+pub fn animation_iteration_count(animation: String) { Property("animation-iteration-count", animation) }
+pub fn animation_direction(animation: String) { Property("animation-direction", animation) }
+pub fn animation_fill_mode(animation: String) { Property("animation-fill-mode", animation) }
+pub fn animation_play_state(animation: String) { Property("animation-play-state", animation) }
 pub fn transition(transition: String) { Property("transition", transition) }
 pub fn translate(translate: String) { Property("translate", translate) }
 pub fn transform(transform: String) { Property("transform", transform) }
