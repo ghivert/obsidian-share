@@ -1,8 +1,5 @@
 body {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--background);
   color: var(--text-color);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
@@ -11,12 +8,14 @@ body {
 :root {
   --background: white;
   --text-color: #000;
-
+  --border-color: #ddd;
+  --green: #27f00c;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #222;
     --text-color: #CCC;
+    --border-color: #333;
   }
 }

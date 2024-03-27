@@ -1,4 +1,4 @@
 // @ts-ignore
-import { main } from './main.gleam'
+import { main } from './frontend.gleam'
 
 document.addEventListener('DOMContentLoaded', main)
