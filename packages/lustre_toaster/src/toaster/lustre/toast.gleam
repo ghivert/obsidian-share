@@ -1,6 +1,26 @@
 import lustre/effect
 import toaster/toast
 
+fn dispatch(content: String, toaster: fn(String) -> Nil) {
+  effect.from(fn(_dispatch) { toaster(content) })
+}
+
 pub fn info(content: String) {
-  effect.from(fn(_dispatch) { toast.info(content) })
+  dispatch(content, toast.info)
+}
+
+pub fn success(content: String) {
+  dispatch(content, toast.success)
+}
+
+pub fn toast(content: String) {
+  dispatch(content, toast.toast)
+}
+
+pub fn error(content: String) {
+  dispatch(content, toast.error)
+}
+
+pub fn warning(content: String) {
+  dispatch(content, toast.warning)
 }

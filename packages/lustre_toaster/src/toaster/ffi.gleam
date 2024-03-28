@@ -13,3 +13,11 @@ pub fn store_dispatcher(_dispatcher: Dispatch) -> Dispatch {
 pub fn dispatcher() -> Dispatch {
   fn(_a) { Nil }
 }
+
+@external(javascript, "../lustre_toaster_ffi.mjs", "isDarkTheme")
+pub fn is_dark_theme() -> Bool {
+  False
+}
+
+@external(javascript, "../lustre_toaster_ffi.mjs", "computeToastSize")
+pub fn compute_toast_size(id: Int) -> Int

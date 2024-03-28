@@ -1,8 +1,10 @@
+import toaster/model/toast.{type Level}
+
 pub type Msg {
-  NewToast(String)
+  NewToast(String, Level)
   ShowToast(Int)
   HideToast(Int, Int)
   RemoveToast(Int)
   StopToast(Int)
-  RunToast(Int)
+  ResumeToast(Int)
 }

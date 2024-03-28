@@ -1,45 +1,21 @@
-import gleam/io
 import gleam/list
 import birl
 import birl/duration.{Duration}
-
-pub type Toast {
-  Toast(
-    id: Int,
-    content: String,
-    displayed: Bool,
-    running: Bool,
-    remaining: Int,
-    last_schedule: birl.Time,
-    iteration: Int,
-  )
-}
+import toaster/model/toast.{type Level, type Toast, Toast}
 
 pub type Model {
   Model(toasts: List(Toast), id: Int)
 }
 
-pub fn empty() {
+pub fn new() {
   let toasts = []
   let id = 0
   Model(toasts: toasts, id: id)
 }
 
-fn new_toast(id: Int, content: String) {
-  Toast(
-    id: id,
-    content: content,
-    displayed: False,
-    running: False,
-    remaining: 5000,
-    last_schedule: birl.now(),
-    iteration: 0,
-  )
-}
-
-pub fn add(model model: Model, message content: String) {
+pub fn add(model model: Model, message content: String, level level: Level) {
   let Model(toasts, id) = model
-  let new_toasts = [new_toast(id, content), ..toasts]
+  let new_toasts = [toast.new(id, content, level), ..toasts]
   let new_id = id + 1
   Model(toasts: new_toasts, id: new_id)
 }
@@ -66,6 +42,17 @@ pub fn hide(model: Model, id: Int) {
   update_toast(model, id, fn(toast) { Toast(..toast, displayed: False) })
 }
 
+pub fn decrease_bottom(model: Model, bottom: Int) {
+  let new_toasts =
+    list.map(model.toasts, fn(toast) {
+      case toast.displayed {
+        True -> Toast(..toast, bottom: toast.bottom - bottom)
+        False -> toast
+      }
+    })
+  Model(..model, toasts: new_toasts)
+}
+
 pub fn stop(model: Model, id: Int) {
   update_toast(model, id, fn(toast) {
     let Duration(elapsed_time) =
@@ -76,7 +63,7 @@ pub fn stop(model: Model, id: Int) {
   })
 }
 
-pub fn run(model: Model, id: Int) {
+pub fn resume(model: Model, id: Int) {
   update_toast(model, id, fn(toast) {
     Toast(..toast, running: True, last_schedule: birl.now())
   })

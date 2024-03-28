@@ -1,9 +1,9 @@
 import gleam/string
-import lustre/event
+import lustre/event.{on_click}
 import lustre/element/html
 import styled
 import styled/size.{px, vh}
-import types.{type Model}
+import types.{type Model, PerformEffect}
 import layout
 import toaster/lustre/toast
 
@@ -62,11 +62,18 @@ fn navbar_styles() {
 }
 
 fn body() {
-  let on_click =
-    event.on_click(types.PerformEffect(toast.info("This is an info toast")))
+  let on_std = on_click(PerformEffect(toast.toast("This is an std toast")))
+  let on_info = on_click(PerformEffect(toast.info("This is an info toast")))
+  let on_success = on_click(PerformEffect(toast.success("This is an su toast")))
+  let on_warning = on_click(PerformEffect(toast.warning("This is an wn toast")))
+  let on_error = on_click(PerformEffect(toast.error("This is an er toast")))
   html.nav([styled.to_lustre(body_styles())], [
     html.text("Body"),
-    html.button([on_click], [html.text("Click me")]),
+    html.button([on_std], [html.text("Click me standard")]),
+    html.button([on_info], [html.text("Click me info")]),
+    html.button([on_success], [html.text("Click me success")]),
+    html.button([on_warning], [html.text("Click me warning")]),
+    html.button([on_error], [html.text("Click me error")]),
   ])
 }
 
