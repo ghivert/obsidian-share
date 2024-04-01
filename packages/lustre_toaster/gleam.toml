@@ -14,11 +14,11 @@ version = "1.0.0"
 # https://gleam.run/writing-gleam/gleam-toml/.
 
 [dependencies]
+birl = "~> 1.6"
 gleam_stdlib = "~> 0.34 or ~> 1.0"
-lustre = "~> 4.0"
+lustre = "~> 4.1.2"
 scheduler = {path = "../scheduler"}
 styled = {path = "../styled"}
-birl = "~> 1.6"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

@@ -18,14 +18,15 @@ export function isDarkTheme() {
 
 export function computeBottomPosition() {
   const [...nodes] = document.getElementsByClassName('toaster-toast')
-  return nodes.reduce((acc, val) => {
-    const dimensions = val.getBoundingClientRect()
-    return Math.max(window.innerHeight - dimensions.top - 12, acc)
+  return nodes.reduce((acc, node) => {
+    if (node.style.right === '-100%') return acc
+    const dimensions = node.getBoundingClientRect()
+    return acc + dimensions.height - 12;
   }, 0)
 }
 
 export function computeToastSize(id) {
   const node = document.getElementsByClassName(`toaster-toast-${id}`)
-  if (node) return node[0].getBoundingClientRect().height - 12
+  if (node && node[0] && node[0].style.right !== '-100%') return node[0].getBoundingClientRect().height - 12
   return 0
 }

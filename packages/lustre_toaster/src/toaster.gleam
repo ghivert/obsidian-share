@@ -34,8 +34,8 @@ fn update(model: Model, msg: Msg) {
       |> result.map(fn(toast) {
         let new_model =
           model
-          |> model.hide(id)
-          |> model.decrease_bottom(ffi.compute_toast_size(toast.id))
+          |> model.hide(toast.id)
+          |> model.decrease_bottom(toast.id)
         #(new_model, schedule(1000, RemoveToast(id)))
       })
       |> result.unwrap(or: #(model, effect.none()))

@@ -1,6 +1,7 @@
 import gleam/list
 import birl
 import birl/duration.{Duration}
+import toaster/ffi
 import toaster/model/toast.{type Level, type Toast, Toast}
 
 pub type Model {
@@ -42,12 +43,13 @@ pub fn hide(model: Model, id: Int) {
   update_toast(model, id, fn(toast) { Toast(..toast, displayed: False) })
 }
 
-pub fn decrease_bottom(model: Model, bottom: Int) {
+pub fn decrease_bottom(model: Model, id: Int) {
+  let bottom = ffi.compute_toast_size(id)
   let new_toasts =
     list.map(model.toasts, fn(toast) {
-      case toast.displayed {
-        True -> Toast(..toast, bottom: toast.bottom - bottom)
-        False -> toast
+      case toast.displayed, toast.id > id {
+        True, True -> Toast(..toast, bottom: toast.bottom - bottom)
+        _, _ -> toast
       }
     })
   Model(..model, toasts: new_toasts)

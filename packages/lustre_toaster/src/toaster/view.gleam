@@ -2,18 +2,22 @@ import gleam/list
 import gleam/int
 import lustre/attribute
 import lustre/event
+import lustre/element
 import lustre/element/html
 import styled
 import styled/size.{px}
 import toaster/model/model.{type Model, Model}
 import toaster/view/colors
 import toaster/model/toast.{type Level, type Toast}
-import toaster/types.{ResumeToast, StopToast}
+import toaster/types.{HideToast, ResumeToast, StopToast}
 
 pub fn view(model: Model) {
   let Model(toasts, _) = model
-  let toasts = list.map(toasts, fn(toast) { view_toast(toast) })
-  html.div([], toasts)
+  element.keyed(html.div([], _), {
+    use toast <- list.map(toasts)
+    let id = int.to_string(toast.id)
+    #(id, view_toast(toast))
+  })
 }
 
 fn view_toast(toast: Toast) {
@@ -29,7 +33,7 @@ fn view_toast(toast: Toast) {
         #("padding", "12px"),
         #("position", "fixed"),
         right_position_styles(toast.displayed),
-        #("bottom", int.to_string(toast.bottom) <> "px"),
+        #("bottom", int.to_string(int.max(0, toast.bottom)) <> "px"),
         #("transition", "right 1s, bottom 1s"),
       ]),
       attribute.classes([
@@ -39,7 +43,10 @@ fn view_toast(toast: Toast) {
     ],
     [
       html.div(attrs, [
-        html.div([text_wrapper()], [html.text(toast.content)]),
+        html.div(
+          [text_wrapper(), event.on_click(HideToast(toast.id, toast.iteration))],
+          [html.text(toast.content)],
+        ),
         html.div([pb_styles(), pb_color(toast.running, toast.level)], []),
       ]),
     ],
