@@ -6,14 +6,15 @@ import lustre/effect
 import toaster/model/model.{type Model, Model}
 import toaster/lustre/schedule.{schedule}
 import toaster/view.{view}
+import toaster/options.{type Options}
 import toaster/ffi
 import toaster/types.{
   type Msg, HideToast, NewToast, RemoveToast, ResumeToast, ShowToast, StopToast,
 }
 
-pub fn setup() {
+pub fn setup(options: Options) {
   let dispatcher =
-    fn(_) { #(model.new(), effect.none()) }
+    fn(_) { #(model.new(options), effect.none()) }
     |> lustre.application(update, view)
     |> lustre.start("#toaster", Nil)
 
@@ -23,9 +24,14 @@ pub fn setup() {
   |> result.replace(Nil)
 }
 
+pub fn simple() {
+  setup(options.default())
+}
+
 fn update(model: Model, msg: Msg) {
+  let time = model.options.timeout
   case msg {
-    ShowToast(id) -> #(model.show(model, id), schedule(5000, HideToast(id, 0)))
+    ShowToast(id) -> #(model.show(model, id), schedule(time, HideToast(id, 0)))
     RemoveToast(id) -> #(model.remove(model, id), effect.none())
     StopToast(id) -> #(model.stop(model, id), effect.none())
     HideToast(id, iteration) ->

@@ -11,6 +11,7 @@ pub type Toast {
     iteration: Int,
     bottom: Int,
     level: Level,
+    animation_duration: Int,
   )
 }
 
@@ -25,17 +26,18 @@ pub type Level {
 @external(javascript, "../../lustre_toaster_ffi.mjs", "computeBottomPosition")
 fn compute_bottom_position() -> Int
 
-pub fn new(id: Int, content: String, level: Level) {
+pub fn new(id: Int, content: String, level: Level, animation_duration: Int) {
   Toast(
     id: id,
     content: content,
     displayed: False,
     running: False,
-    remaining: 5000,
+    remaining: animation_duration,
     last_schedule: birl.now(),
     iteration: 0,
     bottom: compute_bottom_position(),
     level: level,
+    animation_duration: animation_duration,
   )
 }
 

@@ -3,26 +3,27 @@ import birl
 import birl/duration.{Duration}
 import toaster/ffi
 import toaster/model/toast.{type Level, type Toast, Toast}
+import toaster/options.{type Options}
 
 pub type Model {
-  Model(toasts: List(Toast), id: Int)
+  Model(toasts: List(Toast), id: Int, options: Options)
 }
 
-pub fn new() {
+pub fn new(options: Options) {
   let toasts = []
   let id = 0
-  Model(toasts: toasts, id: id)
+  Model(toasts: toasts, id: id, options: options)
 }
 
 pub fn add(model model: Model, message content: String, level level: Level) {
-  let Model(toasts, id) = model
-  let new_toasts = [toast.new(id, content, level), ..toasts]
+  let Model(toasts, id, options) = model
+  let new_toasts = [toast.new(id, content, level, options.timeout), ..toasts]
   let new_id = id + 1
-  Model(toasts: new_toasts, id: new_id)
+  Model(toasts: new_toasts, id: new_id, options: options)
 }
 
 fn update_toast(model: Model, id: Int, updater: fn(Toast) -> Toast) {
-  let Model(toasts, current_id) = model
+  let Model(toasts, current_id, options) = model
   let new_toasts = {
     use toast <- list.map(toasts)
     case id == toast.id {
@@ -30,7 +31,7 @@ fn update_toast(model: Model, id: Int, updater: fn(Toast) -> Toast) {
       False -> toast
     }
   }
-  Model(new_toasts, current_id)
+  Model(new_toasts, current_id, options)
 }
 
 pub fn show(model: Model, id: Int) {
@@ -75,7 +76,7 @@ pub fn resume(model: Model, id: Int) {
 }
 
 pub fn remove(model: Model, id: Int) {
-  let Model(toasts, current_id) = model
+  let Model(toasts, current_id, options) = model
   let new_toasts = list.filter(toasts, fn(toast) { toast.id != id })
-  Model(new_toasts, current_id)
+  Model(new_toasts, current_id, options)
 }

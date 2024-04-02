@@ -1,66 +1,75 @@
-import gleam/list
-import gleam/int
 import gleam/bool
+import gleam/int
+import gleam/list
 import gleam/string
 import lustre/attribute
-import lustre/event
 import lustre/element
 import lustre/element/html
+import lustre/event
 import styled
 import styled/size.{percent, px}
 import toaster/model/model.{type Model, Model}
-import toaster/view/colors
 import toaster/model/toast.{type Level, type Toast}
-import toaster/types.{HideToast, ResumeToast, StopToast}
+import toaster/types.{type Msg, HideToast, ResumeToast, StopToast}
+import toaster/view/colors
+import toaster/view/progress_bar
 
 pub fn view(model: Model) {
-  let Model(toasts, _) = model
+  let Model(toasts, _, _) = model
   element.keyed(html.div([], _), {
     use toast <- list.map(toasts)
     let id = int.to_string(toast.id)
-    #(id, view_toast(toast))
+    #(id, view_toast_wrapper(toast))
   })
 }
 
-fn view_toast(toast: Toast) {
-  let id =
-    ["toast", bool.to_string(toast.displayed), int.to_string(toast.bottom)]
-    |> string.join("-")
-  let attrs = [
-    color_styles(toast.level),
-    base_styles(),
-    event.on_mouse_enter(StopToast(toast.id)),
-    event.on_mouse_leave(ResumeToast(toast.id)),
-  ]
+fn view_toast_wrapper(toast: Toast) {
+  let on_hide = event.on_click(HideToast(toast.id, toast.iteration))
+  html.div([wrapper_position_style(toast), wrapper_dom_classes(toast.id)], [
+    view_toast(toast, [
+      html.div([text_wrapper(), on_hide], [html.text(toast.content)]),
+      progress_bar.view(toast),
+    ]),
+  ])
+}
+
+fn view_toast(toast: Toast, children: List(element.Element(Msg))) {
   html.div(
     [
-      styled.to_lustre(
-        styled.style(id, [
-          styled.padding(px(12)),
-          styled.position("fixed"),
-          right_position_styles(toast.displayed),
-          styled.bottom(px(int.max(0, toast.bottom))),
-          styled.transition("right 1s, bottom 1s"),
-        ]),
-      ),
-      attribute.classes([
-        #("toaster-toast", True),
-        #("toaster-toast-" <> int.to_string(toast.id), True),
-      ]),
+      toast_colors(toast.level),
+      toast_class(),
+      event.on_mouse_enter(StopToast(toast.id)),
+      event.on_mouse_leave(ResumeToast(toast.id)),
     ],
-    [
-      html.div(attrs, [
-        html.div(
-          [text_wrapper(), event.on_click(HideToast(toast.id, toast.iteration))],
-          [html.text(toast.content)],
-        ),
-        html.div([pb_styles(), pb_color(toast.running, toast.level)], []),
-      ]),
-    ],
+    children,
   )
 }
 
-fn base_styles() {
+fn wrapper_position_style(toast: Toast) {
+  let min_bot = int.max(0, toast.bottom)
+  ["toast", bool.to_string(toast.displayed), int.to_string(min_bot)]
+  |> string.join("-")
+  |> styled.style([
+    styled.padding(px(12)),
+    styled.position("fixed"),
+    styled.bottom(px(min_bot)),
+    styled.transition("right 0.7s, bottom 0.7s"),
+    case toast.displayed {
+      True -> styled.right(px(0))
+      False -> styled.right(percent(-100))
+    },
+  ])
+  |> styled.to_lustre()
+}
+
+fn wrapper_dom_classes(id: Int) {
+  attribute.classes([
+    #("toaster-toast", True),
+    #("toaster-toast-" <> int.to_string(id), True),
+  ])
+}
+
+fn toast_class() {
   styled.class([
     styled.display("flex"),
     styled.flex_direction("column"),
@@ -78,14 +87,15 @@ fn base_styles() {
   |> styled.to_lustre()
 }
 
-fn color_styles(level: Level) {
+fn toast_colors(level: Level) {
   let #(background, text_color) = colors.from_level(level)
   let id = string.join(["toaster", background, text_color], "-")
-  styled.style(id, [
-    styled.background("var(--toaster-info-background, " <> background <> ")"),
-    styled.color("var(--toaster-info-text-color, " <> text_color <> ")"),
-  ])
-  |> styled.to_lustre()
+  styled.to_lustre(
+    styled.style(id, [
+      styled.background("var(--toaster-info-background, " <> background <> ")"),
+      styled.color("var(--toaster-info-text-color, " <> text_color <> ")"),
+    ]),
+  )
 }
 
 fn text_wrapper() {
@@ -96,31 +106,4 @@ fn text_wrapper() {
     styled.padding_("8px 16px"),
   ])
   |> styled.to_lustre()
-}
-
-fn pb_styles() {
-  styled.class([
-    styled.animation("50s linear 0s progress_bar"),
-    styled.animation_fill_mode("forwards"),
-    styled.height(px(5)),
-  ])
-  |> styled.to_lustre()
-}
-
-fn pb_color(running: Bool, level: Level) {
-  let back = colors.progress_bar_from_level(level)
-  let running_str = toast.running_to_string(running)
-  let id = string.join(["toaster", "pb", running_str, back], "-")
-  styled.style(id, [
-    styled.animation_play_state(running_str),
-    styled.background("var(--toaster-info-progress-bar, " <> back <> ")"),
-  ])
-  |> styled.to_lustre()
-}
-
-fn right_position_styles(displayed: Bool) {
-  case displayed {
-    True -> styled.right(px(0))
-    False -> styled.right(percent(-100))
-  }
 }

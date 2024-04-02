@@ -6,9 +6,13 @@ import lustre_http as http
 import layout/main.{main_layout}
 import types
 import toaster
+import toaster/options
 
 pub fn main() {
-  let assert Ok(_) = toaster.setup()
+  let assert Ok(_) =
+    options.default()
+    |> options.timeout(5000)
+    |> toaster.setup()
   let assert Ok(_) =
     fn(_) { #(types.init(), effect.none()) }
     |> lustre.application(update, main_layout)
