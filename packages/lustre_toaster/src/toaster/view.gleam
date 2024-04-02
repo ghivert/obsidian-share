@@ -25,7 +25,7 @@ pub fn view(model: Model) {
 
 fn view_toast_wrapper(toast: Toast) {
   let on_hide = event.on_click(HideToast(toast.id, toast.iteration))
-  html.div([wrapper_position_style(toast), wrapper_dom_classes(toast.id)], [
+  html.div([wrapper_position_style(toast), wrapper_dom_classes(toast)], [
     view_toast(toast, [
       html.div([text_wrapper(), on_hide], [html.text(toast.content)]),
       progress_bar.view(toast),
@@ -56,16 +56,21 @@ fn wrapper_position_style(toast: Toast) {
     styled.transition("right 0.7s, bottom 0.7s"),
     case toast.displayed {
       True -> styled.right(px(0))
-      False -> styled.right(percent(-100))
+      False -> styled.right_("calc(-1 * var(--toaster-width, 320px) - 100px)")
     },
   ])
   |> styled.to_lustre()
 }
 
-fn wrapper_dom_classes(id: Int) {
+fn wrapper_dom_classes(toast: Toast) {
+  let displayed = case toast.displayed {
+    True -> "visible"
+    False -> "hidden"
+  }
   attribute.classes([
     #("toaster-toast", True),
-    #("toaster-toast-" <> int.to_string(id), True),
+    #("toaster-toast-" <> int.to_string(toast.id), True),
+    #("toaster-toast-" <> displayed, True),
   ])
 }
 

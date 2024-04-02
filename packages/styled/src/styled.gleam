@@ -433,6 +433,22 @@ pub fn left(size: Size) {
   Property("left", size.to_string(size), False)
 }
 
+pub fn top_(size: String) {
+  Property("top", size, False)
+}
+
+pub fn bottom_(size: String) {
+  Property("bottom", size, False)
+}
+
+pub fn right_(size: String) {
+  Property("right", size, False)
+}
+
+pub fn left_(size: String) {
+  Property("left", size, False)
+}
+
 pub fn box_shadow(box_shadow: String) {
   Property("box-shadow", box_shadow, False)
 }

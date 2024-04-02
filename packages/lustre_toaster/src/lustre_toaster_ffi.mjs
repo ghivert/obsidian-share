@@ -19,7 +19,7 @@ export function isDarkTheme() {
 export function computeBottomPosition() {
   const [...nodes] = document.getElementsByClassName('toaster-toast')
   return nodes.reduce((acc, node) => {
-    if (node.style.right === '-100%') return acc
+    if (node.classList.contains('toaster-toast-hidden')) return acc
     const dimensions = node.getBoundingClientRect()
     return acc + dimensions.height - 12;
   }, 0)
@@ -27,6 +27,9 @@ export function computeBottomPosition() {
 
 export function computeToastSize(id) {
   const node = document.getElementsByClassName(`toaster-toast-${id}`)
-  if (node && node[0] && node[0].style.right !== '-100%') return node[0].getBoundingClientRect().height - 12
+  if (node && node[0]) {
+    if (node[0].classList.contains('toaster-toast-visible'))
+      return node[0].getBoundingClientRect().height - 12
+  }
   return 0
 }
