@@ -1,7 +1,7 @@
 import lustre
 import toaster/ffi
-import toaster/types.{NewToast}
 import toaster/model/toast.{type Level, Error, Info, Standard, Success, Warning}
+import toaster/types.{NewToast}
 
 fn dispatch_toast(content: String, level: Level) {
   let toaster_dispatch = ffi.dispatcher()

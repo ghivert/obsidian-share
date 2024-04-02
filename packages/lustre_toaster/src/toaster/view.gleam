@@ -7,7 +7,7 @@ import lustre/element
 import lustre/element/html
 import lustre/event
 import styled
-import styled/size.{percent, px}
+import styled/size.{px}
 import toaster/model/model.{type Model, Model}
 import toaster/model/toast.{type Level, type Toast}
 import toaster/types.{type Msg, HideToast, ResumeToast, StopToast}

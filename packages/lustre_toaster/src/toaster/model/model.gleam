@@ -1,6 +1,6 @@
-import gleam/list
 import birl
 import birl/duration.{Duration}
+import gleam/list
 import toaster/ffi
 import toaster/model/toast.{type Level, type Toast, Toast}
 import toaster/options.{type Options}

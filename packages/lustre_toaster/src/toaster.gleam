@@ -3,14 +3,14 @@ import gleam/list
 import gleam/result
 import lustre
 import lustre/effect
-import toaster/model/model.{type Model, Model}
-import toaster/lustre/schedule.{schedule}
-import toaster/view.{view}
-import toaster/options.{type Options}
 import toaster/ffi
+import toaster/lustre/schedule.{schedule}
+import toaster/model/model.{type Model, Model}
+import toaster/options.{type Options}
 import toaster/types.{
   type Msg, HideToast, NewToast, RemoveToast, ResumeToast, ShowToast, StopToast,
 }
+import toaster/view.{view}
 
 pub fn setup(options: Options) {
   let dispatcher =
