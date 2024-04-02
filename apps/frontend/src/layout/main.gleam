@@ -24,7 +24,6 @@ fn main_styles() {
     styled.grid_template_rows("auto 1fr"),
     styled.min_height(vh(100)),
   ])
-  |> styled.memo()
 }
 
 fn header() {
@@ -45,7 +44,6 @@ fn header_styles() {
     styled.display("flex"),
     styled.justify_content("space-between"),
   ])
-  |> styled.memo()
 }
 
 fn navbar() {
@@ -58,7 +56,6 @@ fn navbar_styles() {
     styled.padding(px(12)),
     styled.border_right("1px solid var(--border-color)"),
   ])
-  |> styled.memo()
 }
 
 fn body() {
@@ -79,5 +76,4 @@ fn body() {
 
 fn body_styles() {
   styled.class([styled.grid_area("body")])
-  |> styled.memo()
 }

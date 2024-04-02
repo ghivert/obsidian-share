@@ -6,6 +6,7 @@ import styled/media.{type Query}
 import styled/size.{type Size}
 
 pub opaque type Class
+pub opaque type Styles
 pub opaque type Media
 pub opaque type NoMedia
 pub opaque type PseudoSelector
@@ -214,10 +215,32 @@ pub fn compose(class: Class) {
 }
 
 @external(javascript, "./styled_ffi.mjs", "compileClass")
-pub fn class(styles: List(Style(media, pseudo))) -> Class
+fn compile_class(styles: List(Style(media, pseudo))) -> Class
+
+@external(javascript, "./styled_ffi.mjs", "compileClass")
+fn compile_style(styles: List(Style(media, pseudo)), id: String) -> Class
+
+@external(javascript, "./styled_ffi.mjs", "memo")
+fn memo(class: Class) -> Class
 
 @external(javascript, "./styled_ffi.mjs", "toString")
 fn to_string(class: Class) -> String
+
+pub fn class(styles: List(Style(media, pseudo))) -> Class {
+  styles
+  |> compile_class()
+  |> memo()
+}
+
+pub fn style(id: String, styles: List(Style(media, pseudo))) -> Class {
+  styles
+  |> compile_style(id)
+}
+
+pub fn to_class_name(class: Class) -> String {
+  class
+  |> to_string()
+}
 
 pub fn to_lustre(class: Class) -> Attribute(a) {
   class
@@ -226,6 +249,3 @@ pub fn to_lustre(class: Class) -> Attribute(a) {
   |> list.map(fn(value) { #(value, True) })
   |> attribute.classes()
 }
-
-@external(javascript, "./styled_ffi.mjs", "memo")
-pub fn memo(class: Class) -> Class

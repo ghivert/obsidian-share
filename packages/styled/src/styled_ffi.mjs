@@ -87,8 +87,8 @@ const sameObjects = (args, previousArgs) => {
   return true
 }
 
-export function compileClass(args) {
-  const callingClass = getCallingFunction()
+export function compileClass(args, classId) {
+  const callingClass = classId ?? getCallingFunction()
   const content = cache[callingClass]
   if (content) {
     if (content.memoized) return { name: content.name, callingClass }
@@ -97,6 +97,8 @@ export function compileClass(args) {
     if (!isSame) styleSheet.deleteRule(content.indexRule)
   }
 
+  // Keeping track of test to better display class names.
+  // const id = classId?.replace(/[ ,#\.()]/g, '-') ?? uniqueId()
   const id = uniqueId()
   const { properties, medias, classes, pseudoSelectors } = computeProperties(args)
   const wrapClass = (properties, indent, pseudo = '') => {
