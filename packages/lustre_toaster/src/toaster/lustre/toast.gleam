@@ -2,7 +2,8 @@ import lustre/effect
 import toaster/toast
 
 fn dispatch(content: String, toaster: fn(String) -> Nil) {
-  effect.from(fn(_dispatch) { toaster(content) })
+  use _dispatch <- effect.from()
+  toaster(content)
 }
 
 pub fn info(content: String) {

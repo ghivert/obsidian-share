@@ -63,6 +63,8 @@ fn base_styles() {
     styled.max_height_("var(--toast-max-height, 800px)"),
     // Spacings
     styled.border_radius("var(--toaster-border-radius, 6px)"),
+    // Colors
+    styled.box_shadow("0px 4px 12px rgba(0, 0, 0, 0.1)"),
     // Animation
     styled.overflow("hidden"),
   ])
