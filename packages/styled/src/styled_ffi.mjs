@@ -28,7 +28,7 @@ function computeProperties(rawProperties, indent = 2) {
       return { properties, medias, classes: [...classes, property.class_name], pseudoSelectors, indent }
     }
     if ('key' in property && 'value' in property) {
-      const cssProperty = `${baseIndent}${property.key}: ${property.value};`
+      const cssProperty = `${baseIndent}${property.key}: ${property.value}${property.important ? ' !important' : ''};`
       return { properties: [...properties, cssProperty], medias, classes, pseudoSelectors, indent }
     }
     if ('pseudo_selector' in property && 'styles' in property) {
@@ -75,7 +75,9 @@ const sameObjects = (args, previousArgs) => {
     typeof args === 'string' ||
     typeof previousArgs === 'string' ||
     typeof args === 'number' ||
-    typeof previousArgs === 'number'
+    typeof previousArgs === 'number' ||
+    typeof args === 'boolean' ||
+    typeof previousArgs === 'boolean'
   )
     return args === previousArgs
   if (typeof args !== 'object' || typeof previousArgs !== 'object') return false
