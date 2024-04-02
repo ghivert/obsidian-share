@@ -4,3 +4,8 @@ build/
 priv/
 erl_crash.dump
 node_modules/
+
+.terraform/
+terraform.tfstate*
+env.tfvars
+config.ts
