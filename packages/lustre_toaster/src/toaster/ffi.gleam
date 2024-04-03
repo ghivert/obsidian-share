@@ -21,3 +21,6 @@ pub fn is_dark_theme() -> Bool {
 
 @external(javascript, "../lustre_toaster_ffi.mjs", "computeToastSize")
 pub fn compute_toast_size(id: Int) -> Int
+
+@external(javascript, "../lustre_toaster_ffi.mjs", "createNode")
+pub fn create_node() -> Nil

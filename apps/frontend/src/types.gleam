@@ -1,18 +1,38 @@
 import gleam/option.{type Option, None}
-import lustre/effect.{type Effect}
 import firebase/auth.{type Credentials}
+import lustre/effect.{type Effect}
 
 pub type Model {
-  Model(web_authn: Option(String))
+  Disconnected(email: String, password: String)
+  Connected(user: Credentials)
 }
 
 pub fn init() {
-  Model(web_authn: None)
+  Disconnected(email: "", password: "")
+}
+
+pub fn update_email(model: Model, email: String) {
+  case model {
+    Disconnected(_, password) -> Disconnected(email, password)
+    _ -> model
+  }
+}
+
+pub fn update_password(model: Model, password: String) {
+  case model {
+    Disconnected(email, _) -> Disconnected(email, password)
+    _ -> model
+  }
+}
+
+pub type Authenticate {
+  SubmitEmailPassword
+  UpdateEmail(String)
+  UpdatePassword(String)
 }
 
 pub type Msg {
   NoOp
   PerformEffect(Effect(Msg))
-  WebAuthnMsg(String)
-  Authenticate(Result(Credentials, auth.AuthError))
+  Authenticate(Authenticate)
 }

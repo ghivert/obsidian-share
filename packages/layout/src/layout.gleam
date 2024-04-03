@@ -8,6 +8,7 @@ import lustre/element/html
 import layout/align
 import layout/justify
 import styled.{type Style}
+import styled/size.{px}
 
 pub opaque type Attributes {
   Direction(String)
@@ -45,11 +46,7 @@ fn reduce_attributes(attrs: Dict(String, Style(m, p)), value: Attributes) {
     Direction(dir) -> dict.insert(attrs, "dir", styled.flex_direction(dir))
     Align(align) -> dict.insert(attrs, "align", styled.align_items(align))
     Justify(jstf) -> dict.insert(attrs, "justify", styled.justify_content(jstf))
-    Gap(gap) -> {
-      let gap_value = int.to_string(gap)
-      let gap_style = string.append(gap_value, "px")
-      dict.insert(attrs, "gap", styled.gap(gap_style))
-    }
+    Gap(gap) -> dict.insert(attrs, "gap", styled.gap(px(gap)))
   }
 }
 

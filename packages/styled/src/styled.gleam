@@ -93,6 +93,10 @@ pub fn font_style(font_style: String) {
   Property("font-style", font_style, False)
 }
 
+pub fn font_size(font_size: Size) {
+  Property("font-size", size.to_string(font_size), False)
+}
+
 pub fn font_weight(font_weight: String) {
   Property("font-weight", font_weight, False)
 }
@@ -170,7 +174,7 @@ pub fn display(display: String) {
 }
 
 pub fn z_index(z_index: Int) {
-  Property("z_index", int.to_string(z_index), False)
+  Property("z-index", int.to_string(z_index), False)
 }
 
 pub fn visibility(visibility: String) {
@@ -249,7 +253,11 @@ pub fn offset_rotate(offset_rotate: String) {
   Property("offset-rotate", offset_rotate, False)
 }
 
-pub fn gap(gap: String) {
+pub fn gap(gap: Size) {
+  Property("gap", size.to_string(gap), False)
+}
+
+pub fn ga_(gap: String) {
   Property("gap", gap, False)
 }
 
@@ -509,7 +517,11 @@ pub fn border_left(border_left: String) {
   Property("border-left", border_left, False)
 }
 
-pub fn border_radius(border_radius: String) {
+pub fn border_radius(border_radius: Size) {
+  Property("border-radius", size.to_string(border_radius), False)
+}
+
+pub fn border_radius_(border_radius: String) {
   Property("border-radius", border_radius, False)
 }
 

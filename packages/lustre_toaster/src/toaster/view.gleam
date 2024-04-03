@@ -83,7 +83,7 @@ fn toast_class() {
     styled.min_height_("var(--toast-min-height, 64px)"),
     styled.max_height_("var(--toast-max-height, 800px)"),
     // Spacings
-    styled.border_radius("var(--toaster-border-radius, 6px)"),
+    styled.border_radius_("var(--toaster-border-radius, 6px)"),
     // Colors
     styled.box_shadow("0px 4px 12px rgba(0, 0, 0, 0.1)"),
     // Animation

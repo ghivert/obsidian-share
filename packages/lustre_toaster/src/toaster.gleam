@@ -13,10 +13,12 @@ import toaster/types.{
 import toaster/view.{view}
 
 pub fn setup(options: Options) {
+  ffi.create_node()
+
   let dispatcher =
     fn(_) { #(model.new(options), effect.none()) }
     |> lustre.application(update, view)
-    |> lustre.start("#toaster", Nil)
+    |> lustre.start("#grille-pain", Nil)
 
   dispatcher
   |> result.map_error(io.debug)
