@@ -16,7 +16,7 @@ import toaster/view/progress_bar
 
 pub fn view(model: Model) {
   let Model(toasts, _, _) = model
-  element.keyed(html.div([], _), {
+  element.keyed(html.div([attribute.class("grille-pain")], _), {
     use toast <- list.map(toasts)
     let id = int.to_string(toast.id)
     #(id, view_toast_wrapper(toast))

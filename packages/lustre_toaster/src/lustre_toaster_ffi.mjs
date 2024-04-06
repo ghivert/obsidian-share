@@ -37,5 +37,6 @@ export function computeToastSize(id) {
 export function createNode() {
   const node = document.createElement('div')
   node.setAttribute('id', 'grille-pain')
+  node.setAttribute('class', 'grille-pain')
   document.body.appendChild(node)
 }

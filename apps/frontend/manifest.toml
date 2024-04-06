@@ -17,7 +17,7 @@ packages = [
   { name = "lustre_toaster", version = "1.0.0", build_tools = ["gleam"], requirements = ["birl", "gleam_stdlib", "lustre", "scheduler", "sketch"], source = "local", path = "../../packages/lustre_toaster" },
   { name = "ranger", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "1566C272B1D141B3BBA38B25CB761EF56E312E79EC0E2DFD4D3C19FB0CC1F98C" },
   { name = "scheduler", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], source = "local", path = "../../packages/scheduler" },
-  { name = "sketch", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre"], otp_app = "sketch", source = "hex", outer_checksum = "97EB7A68AD33548ADCB0B6D6B69D52EA37E2163A8487071610C039933C4C24F6" },
+  { name = "sketch", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre"], otp_app = "sketch", source = "hex", outer_checksum = "026EBEF74FE76947F1ADD5FB030FF79010C73176F4798249FEF9659224C12341" },
   { name = "thoas", version = "0.4.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "4918D50026C073C4AB1388437132C77A6F6F7C8AC43C60C13758CC0ADCE2134E" },
 ]
 
