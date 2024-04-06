@@ -4,7 +4,7 @@ import lustre/attribute
 import lustre/event
 import lustre/element
 import lustre/element/html
-import styled
+import sketch
 import views/login_page/styles
 import types.{Authenticate, SubmitEmailPassword, UpdateEmail, UpdatePassword}
 
@@ -32,8 +32,8 @@ fn submit(value value: String, type_ type_: String, active active: Bool) {
     styles.submit(),
     attribute.value(value),
     attribute.type_(type_),
-    styled.style(id, [styled.background(bg), styled.color(txt)])
-      |> styled.to_lustre(),
+    sketch.dynamic(id, [sketch.background(bg), sketch.color(txt)])
+      |> sketch.to_lustre(),
   ])
 }
 

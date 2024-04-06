@@ -6,8 +6,8 @@ import lustre/attribute
 import lustre/element
 import lustre/element/html
 import lustre/event
-import styled
-import styled/size.{px}
+import sketch
+import sketch/size.{px}
 import toaster/model/model.{type Model, Model}
 import toaster/model/toast.{type Level, type Toast}
 import toaster/types.{type Msg, HideToast, ResumeToast, StopToast}
@@ -49,17 +49,17 @@ fn wrapper_position_style(toast: Toast) {
   let min_bot = int.max(0, toast.bottom)
   ["toast", bool.to_string(toast.displayed), int.to_string(min_bot)]
   |> string.join("-")
-  |> styled.style([
-    styled.padding(px(12)),
-    styled.position("fixed"),
-    styled.bottom(px(min_bot)),
-    styled.transition("right 0.7s, bottom 0.7s"),
+  |> sketch.dynamic([
+    sketch.padding(px(12)),
+    sketch.position("fixed"),
+    sketch.bottom(px(min_bot)),
+    sketch.transition("right 0.7s, bottom 0.7s"),
     case toast.displayed {
-      True -> styled.right(px(0))
-      False -> styled.right_("calc(-1 * var(--toaster-width, 320px) - 100px)")
+      True -> sketch.right(px(0))
+      False -> sketch.right_("calc(-1 * var(--toaster-width, 320px) - 100px)")
     },
   ])
-  |> styled.to_lustre()
+  |> sketch.to_lustre()
 }
 
 fn wrapper_dom_classes(toast: Toast) {
@@ -75,40 +75,40 @@ fn wrapper_dom_classes(toast: Toast) {
 }
 
 fn toast_class() {
-  styled.class([
-    styled.display("flex"),
-    styled.flex_direction("column"),
+  sketch.class([
+    sketch.display("flex"),
+    sketch.flex_direction("column"),
     // Sizes
-    styled.width_("var(--toaster-width, 320px)"),
-    styled.min_height_("var(--toast-min-height, 64px)"),
-    styled.max_height_("var(--toast-max-height, 800px)"),
+    sketch.width_("var(--toaster-width, 320px)"),
+    sketch.min_height_("var(--toast-min-height, 64px)"),
+    sketch.max_height_("var(--toast-max-height, 800px)"),
     // Spacings
-    styled.border_radius_("var(--toaster-border-radius, 6px)"),
+    sketch.border_radius_("var(--toaster-border-radius, 6px)"),
     // Colors
-    styled.box_shadow("0px 4px 12px rgba(0, 0, 0, 0.1)"),
+    sketch.box_shadow("0px 4px 12px rgba(0, 0, 0, 0.1)"),
     // Animation
-    styled.overflow("hidden"),
+    sketch.overflow("hidden"),
   ])
-  |> styled.to_lustre()
+  |> sketch.to_lustre()
 }
 
 fn toast_colors(level: Level) {
   let #(background, text_color) = colors.from_level(level)
   let id = string.join(["toaster", background, text_color], "-")
-  styled.to_lustre(
-    styled.style(id, [
-      styled.background("var(--toaster-info-background, " <> background <> ")"),
-      styled.color("var(--toaster-info-text-color, " <> text_color <> ")"),
+  sketch.to_lustre(
+    sketch.dynamic(id, [
+      sketch.background("var(--toaster-info-background, " <> background <> ")"),
+      sketch.color("var(--toaster-info-text-color, " <> text_color <> ")"),
     ]),
   )
 }
 
 fn text_wrapper() {
-  styled.class([
-    styled.display("flex"),
-    styled.align_items("center"),
-    styled.flex("1"),
-    styled.padding_("8px 16px"),
+  sketch.class([
+    sketch.display("flex"),
+    sketch.align_items("center"),
+    sketch.flex("1"),
+    sketch.padding_("8px 16px"),
   ])
-  |> styled.to_lustre()
+  |> sketch.to_lustre()
 }
