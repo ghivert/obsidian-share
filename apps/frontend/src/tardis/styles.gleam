@@ -72,8 +72,8 @@ pub fn header() {
 }
 
 pub fn bordered_header() {
-  sketch.class([sketch.compose(header_())])
-  // sketch.border_bottom("2px solid var(--primary)"),
+  [sketch.compose(header_())]
+  |> sketch.class()
   |> sketch.to_lustre()
 }
 
@@ -154,7 +154,8 @@ pub fn toggle_button() {
 }
 
 pub fn keyword_color() {
-  sketch.class([sketch.color("var(--bool)"), sketch.white_space("pre")])
+  [sketch.color("var(--bool)"), sketch.white_space("pre")]
+  |> sketch.class()
   |> sketch.to_lustre()
 }
 
@@ -165,8 +166,11 @@ pub fn flex() {
 }
 
 pub fn debugger_title() {
-  [sketch.display("flex"), sketch.align_items("center"), sketch.gap(px(18))]
-  |> sketch.class()
+  sketch.class([
+    sketch.display("flex"),
+    sketch.align_items("center"),
+    sketch.gap(px(18)),
+  ])
   |> sketch.to_lustre()
 }
 

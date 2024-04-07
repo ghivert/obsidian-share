@@ -42,7 +42,7 @@ pub fn setup() {
 
 fn init(_) {
   colors.choose_color_scheme()
-  |> Model(count: 1, steps: [], opened: True, color_scheme: _)
+  |> Model(count: 1, steps: [], opened: False, color_scheme: _)
   |> pair.new(effect.none())
 }
 
