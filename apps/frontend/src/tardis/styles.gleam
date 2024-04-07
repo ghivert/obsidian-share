@@ -1,5 +1,5 @@
 import sketch
-import sketch/size.{px}
+import sketch/size.{percent, px}
 
 fn panel_() {
   sketch.class([
@@ -72,10 +72,8 @@ pub fn header() {
 }
 
 pub fn bordered_header() {
-  sketch.class([
-    sketch.compose(header_()),
-    sketch.border_bottom("2px solid var(--primary)"),
-  ])
+  sketch.class([sketch.compose(header_())])
+  // sketch.border_bottom("2px solid var(--primary)"),
   |> sketch.to_lustre()
 }
 
@@ -166,6 +164,12 @@ pub fn flex() {
   |> sketch.to_lustre()
 }
 
+pub fn debugger_title() {
+  [sketch.display("flex"), sketch.align_items("center"), sketch.gap(px(18))]
+  |> sketch.class()
+  |> sketch.to_lustre()
+}
+
 pub fn text_color(color: String) {
   { "syntax-" <> color }
   |> sketch.dynamic([sketch.color(color)])
@@ -178,7 +182,24 @@ pub fn subgrid_header() {
     sketch.font_family("Lexend"),
     sketch.background("var(--background)"),
     sketch.padding(px(9)),
-    sketch.border_right("1px solid var(--primary)"),
+  ])
+  |> sketch.to_lustre()
+}
+
+pub fn select_cs() {
+  sketch.class([
+    sketch.appearance("none"),
+    sketch.background("transparent"),
+    sketch.padding(px(6)),
+    sketch.margin(px(0)),
+    sketch.width(percent(100)),
+    sketch.font_size(px(12)),
+    sketch.font_family("inherit"),
+    sketch.line_height("inherit"),
+    sketch.color("var(--primary)"),
+    sketch.border("1px solid var(--primary)"),
+    sketch.border_radius(px(5)),
+    sketch.outline("none"),
   ])
   |> sketch.to_lustre()
 }

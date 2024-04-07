@@ -2,7 +2,6 @@ import gleam/list
 import gleam/option.{type Option}
 import gleam/pair
 import gleam/string
-import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html as h
 import tardis/data.{type Data}

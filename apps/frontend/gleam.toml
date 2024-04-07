@@ -16,6 +16,7 @@ lustre = "~> 4.1.2"
 lustre_http = "~> 0.5"
 lustre_toaster = {path = "../../packages/lustre_toaster"}
 sketch = "~> 1.0.0"
+plinth = "~> 0.1"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
