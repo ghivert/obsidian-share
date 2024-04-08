@@ -61,11 +61,9 @@ fn credentials_inputs(email: String, password: String) {
 }
 
 pub fn login_page(email: String, password: String) {
-  html.div([styles.login_page()], [
-    credentials_inputs(email, password),
-    html.div([styles.decoration()], [
-      html.img([attribute.src("/images/sign-in.svg")]),
-    ]),
-  ])
+  html.div([styles.login_page()], [credentials_inputs(email, password)])
+  // html.div([styles.decoration()], [
+  //   html.img([attribute.src("/images/sign-in.svg")]),
+  // ]),
   |> element.map(Authenticate)
 }

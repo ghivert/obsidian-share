@@ -12,11 +12,11 @@ typescript_declarations = true
 gleam_javascript = "~> 0.8"
 gleam_stdlib = "~> 0.34 or ~> 1.0"
 layout = {path = "../../packages/layout"}
-lustre = "~> 4.1.2"
+lustre = {path = "../../../lustre"}
 lustre_http = "~> 0.5"
 lustre_toaster = {path = "../../packages/lustre_toaster"}
-sketch = "~> 1.0.0"
 plinth = "~> 0.1"
+sketch = "~> 1.0.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

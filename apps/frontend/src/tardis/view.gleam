@@ -4,9 +4,11 @@ import gleam/pair
 import gleam/string
 import lustre/element.{type Element}
 import lustre/element/html as h
+import lustre/event
 import tardis/data.{type Data}
-import tardis/data/model.{type Model, type Step, Model, Step}
+import tardis/data/model.{type Model, Model}
 import tardis/data/msg.{type Msg}
+import tardis/data/step.{type Step, Step}
 import tardis/styles as s
 
 pub fn view_model(model: Model(model, msg)) {
@@ -15,15 +17,19 @@ pub fn view_model(model: Model(model, msg)) {
     True ->
       element.keyed(h.div([s.body()], _), {
         model.steps
-        |> list.map(fn(item) { #(item.index, view_step(item)) })
+        |> list.map(fn(i) { #(i.index, view_step(model.selected_step, i)) })
         |> list.prepend(#("header", view_grid_header(model)))
       })
   }
 }
 
-fn view_step(item: Step(model, msg)) {
+fn view_step(selected_step: Option(String), item: Step(model, msg)) {
   let Step(index, model, msg) = item
-  h.div([s.details()], [
+  let class = case option.unwrap(selected_step, "") == index {
+    True -> s.selected_details()
+    False -> s.details()
+  }
+  h.div([class, event.on_click(msg.BackToStep(item))], [
     h.div([s.step_index()], [h.text(index)]),
     h.div([s.step_msg()], view_data(data.inspect(msg), 0, "")),
     h.div([s.step_model()], view_data(data.inspect(model), 0, "")),

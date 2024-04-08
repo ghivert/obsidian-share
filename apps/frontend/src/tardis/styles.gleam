@@ -3,7 +3,7 @@ import sketch/size.{percent, px}
 
 fn panel_() {
   sketch.class([
-    sketch.z_index(1_000_000),
+    sketch.z_index(1_000_001),
     sketch.display("flex"),
     sketch.flex_direction("column"),
     sketch.position("fixed"),
@@ -27,7 +27,12 @@ pub fn panel() {
 }
 
 pub fn panel_closed() {
-  [sketch.compose(panel_()), sketch.width(px(400))]
+  [
+    sketch.compose(panel_()),
+    sketch.width(px(400)),
+    // sketch.min_height(px(60)),
+    sketch.justify_content("center"),
+  ]
   |> sketch.class()
   |> sketch.to_lustre()
 }
@@ -90,7 +95,7 @@ pub fn body() {
   |> sketch.to_lustre()
 }
 
-pub fn details() {
+fn details_() {
   sketch.class([
     sketch.display("grid"),
     sketch.grid_column("1 / 4"),
@@ -99,6 +104,16 @@ pub fn details() {
     sketch.font_size(px(14)),
     sketch.border_bottom("1px solid var(--gutter)"),
   ])
+}
+
+pub fn details() {
+  details_()
+  |> sketch.to_lustre()
+}
+
+pub fn selected_details() {
+  [sketch.compose(details_()), sketch.background("var(--shadow)")]
+  |> sketch.class()
   |> sketch.to_lustre()
 }
 
@@ -204,6 +219,19 @@ pub fn select_cs() {
     sketch.border("1px solid var(--primary)"),
     sketch.border_radius(px(5)),
     sketch.outline("none"),
+  ])
+  |> sketch.to_lustre()
+}
+
+pub fn frozen_panel() {
+  sketch.class([
+    sketch.position("fixed"),
+    sketch.top(px(0)),
+    sketch.bottom(px(0)),
+    sketch.right(px(0)),
+    sketch.left(px(0)),
+    sketch.z_index(1_000_000),
+    sketch.background("rgba(255, 255, 255, 0.1)"),
   ])
   |> sketch.to_lustre()
 }

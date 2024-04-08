@@ -1,8 +1,8 @@
+import gleam/option.{type Option}
+import lustre/effect.{type Effect}
 import tardis/data/colors
-
-pub type Step(model, msg) {
-  Step(index: String, model: model, msg: msg)
-}
+import tardis/data/msg.{type Msg}
+import tardis/data/step.{type Step}
 
 pub type Model(model, msg) {
   Model(
@@ -10,5 +10,8 @@ pub type Model(model, msg) {
     steps: List(Step(model, msg)),
     opened: Bool,
     color_scheme: colors.ColorScheme,
+    dispatcher: fn(model) -> Effect(Msg(model, msg)),
+    frozen: Bool,
+    selected_step: Option(String),
   )
 }

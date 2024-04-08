@@ -15,16 +15,18 @@ pub fn main() {
     |> options.timeout(5000)
     |> toaster.setup()
 
-  let assert Ok(update_middleware) = tardis.setup()
+  let assert Ok(#(config, update_middleware)) = tardis.setup()
 
   let assert Ok(render) =
     sketch_options.document()
     |> sketch.lustre_setup()
 
-  let assert Ok(_) =
+  let assert Ok(dispatch) =
     fn(_) { #(types.init(), effect.none()) }
     |> lustre.application(update_middleware(update), render(main_layout))
     |> lustre.start("#app", Nil)
+
+  config(dispatch)
 }
 
 fn update(model, msg) {
