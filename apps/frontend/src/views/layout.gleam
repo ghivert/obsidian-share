@@ -3,11 +3,9 @@ import gleam/string
 import layout
 import lustre/element
 import lustre/element/html
-import lustre/event.{on_click}
 import sketch
 import sketch/size.{px, vh}
-import toaster/lustre/toast
-import types.{type Model, Authenticate, Disconnected, PerformEffect}
+import types.{type Model, Disconnected}
 import views/login_page/view as auth
 
 pub fn main_layout(model: Model) {

@@ -1,13 +1,17 @@
+import gleam/dynamic.{type Dynamic}
 import lustre/effect.{type Effect}
 import tardis/data/step.{type Step}
 import tardis/data/colors.{type ColorScheme}
 
-pub type Msg(model, msg) {
+pub type Msg {
+  // Panel
   ToggleOpen
-  AddStep(model, msg)
   UpdateColorScheme(ColorScheme)
-  AddApplication(fn(model) -> Effect(Msg(model, msg)))
-  BackToStep(Step(model, msg))
   Debug(String)
-  Restart
+  SelectDebugger(String)
+  // Debugger
+  AddApplication(String, fn(Dynamic) -> Effect(Msg))
+  AddStep(String, Dynamic, Dynamic)
+  BackToStep(String, Step)
+  Restart(String)
 }

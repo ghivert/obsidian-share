@@ -152,6 +152,7 @@ pub fn actions_section() {
     sketch.display("flex"),
     sketch.gap(px(12)),
     sketch.align_items("center"),
+    sketch.white_space("nowrap"),
   ])
   |> sketch.to_lustre()
 }

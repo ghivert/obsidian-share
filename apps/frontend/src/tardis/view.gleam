@@ -6,30 +6,31 @@ import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event
 import tardis/data.{type Data}
-import tardis/data/model.{type Model, Model}
+import tardis/data/debugger.{type Debugger}
 import tardis/data/msg.{type Msg}
 import tardis/data/step.{type Step, Step}
 import tardis/styles as s
 
-pub fn view_model(model: Model(model, msg)) {
-  case model.opened {
+pub fn view_model(opened: Bool, debugger_: String, model: Debugger) {
+  let selected = model.selected_step
+  case opened {
     False -> element.none()
     True ->
       element.keyed(h.div([s.body()], _), {
         model.steps
-        |> list.map(fn(i) { #(i.index, view_step(model.selected_step, i)) })
-        |> list.prepend(#("header", view_grid_header(model)))
+        |> list.map(fn(i) { #(i.index, view_step(debugger_, selected, i)) })
+        |> list.prepend(#("header", view_grid_header(opened, model)))
       })
   }
 }
 
-fn view_step(selected_step: Option(String), item: Step(model, msg)) {
+fn view_step(debugger_: String, selected_step: Option(String), item: Step) {
   let Step(index, model, msg) = item
   let class = case option.unwrap(selected_step, "") == index {
     True -> s.selected_details()
     False -> s.details()
   }
-  h.div([class, event.on_click(msg.BackToStep(item))], [
+  h.div([class, event.on_click(msg.BackToStep(debugger_, item))], [
     h.div([s.step_index()], [h.text(index)]),
     h.div([s.step_msg()], view_data(data.inspect(msg), 0, "")),
     h.div([s.step_model()], view_data(data.inspect(model), 0, "")),
@@ -49,26 +50,22 @@ fn view_data_line(indent: Int, prefix: String, text: String, color: String) {
   }
 }
 
-fn select_grid_header_class(model: Model(model, msg)) {
-  case model.opened, model.count {
+fn select_grid_header_class(opened: Bool, model: Debugger) {
+  case opened, model.count {
     False, _ | True, 1 -> s.grid_header()
     True, _ -> s.bordered_grid_header()
   }
 }
 
-fn view_grid_header(model: Model(model, msg)) {
-  h.div([select_grid_header_class(model)], [
+fn view_grid_header(opened: Bool, model: Debugger) {
+  h.div([select_grid_header_class(opened, model)], [
     h.div([s.subgrid_header()], [h.text("Step")]),
     h.div([s.subgrid_header()], [h.text("Msg")]),
     h.div([s.subgrid_header()], [h.text("Model")]),
   ])
 }
 
-fn view_data(
-  data: Data,
-  indent i: Int,
-  prefix p: String,
-) -> List(Element(Msg(model, msg))) {
+fn view_data(data: Data, indent i: Int, prefix p: String) -> List(Element(Msg)) {
   case data {
     data.DataNil -> [view_data_line(i, p, "Nil", "var(--nil)")]
     data.DataBool(v) -> [view_data_line(i, p, v, "var(--bool)")]

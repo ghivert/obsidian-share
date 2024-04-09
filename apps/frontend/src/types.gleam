@@ -1,4 +1,3 @@
-import gleam/option.{type Option, None}
 import firebase/auth.{type Credentials}
 import lustre/effect.{type Effect}
 

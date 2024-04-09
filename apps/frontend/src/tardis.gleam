@@ -1,8 +1,8 @@
-import gleam/dynamic
+import gleam/dynamic.{type Dynamic}
 import gleam/int
 import gleam/io
 import gleam/list
-import gleam/option
+import gleam/option.{Some}
 import gleam/pair
 import gleam/result
 import lustre.{type Action}
@@ -15,23 +15,28 @@ import lustre/event
 import sketch
 import sketch/options as sketch_options
 import tardis/data/colors
+import tardis/data/debugger.{Debugger} as debugger_
 import tardis/data/model.{type Model, Model}
 import tardis/data/msg.{type Msg}
 import tardis/data/step.{type Step, Step}
 import tardis/styles as s
 import tardis/view as v
 
-fn create_model_updater(dispatch: fn(Action(Msg(model, msg), c)) -> Nil) {
-  fn(dispatcher: fn(Action(d, e)) -> Nil) {
-    fn(model: model) -> Effect(Msg(model, msg)) {
+fn create_model_updater(
+  application: String,
+  dispatch: fn(Action(Msg, c)) -> Nil,
+) {
+  fn(dispatcher: Dynamic) {
+    fn(model: Dynamic) -> Effect(Msg) {
       effect.from(fn(_) {
+        io.debug(dynamic.unsafe_coerce(dispatcher))
         model
         |> dynamic.from()
         |> runtime.UpdateModel()
-        |> dispatcher()
+        |> dynamic.unsafe_coerce(dispatcher)
       })
     }
-    |> msg.AddApplication()
+    |> msg.AddApplication(application, _)
     |> lustre.dispatch()
     |> dispatch()
   }
@@ -45,60 +50,83 @@ pub fn setup() {
   lustre.application(init, update, render(view))
   |> lustre.start("#tardis", Nil)
   |> result.map(fn(dispatch) {
-    #(create_model_updater(dispatch), fn(update) {
-      fn(model, msg) -> #(model, effect.Effect(msg)) {
-        let new_state = update(model, msg)
+    fn(application: String) {
+      #(create_model_updater(application, dispatch), fn(update) {
+        fn(model, msg) -> #(model, effect.Effect(msg)) {
+          let new_state = update(model, msg)
 
-        // Keep model to display it in Tardis
-        pair.first(new_state)
-        |> msg.AddStep(msg)
-        |> lustre.dispatch()
-        |> dispatch()
+          // Keep model to display it in Tardis
+          pair.first(new_state)
+          |> dynamic.from()
+          |> msg.AddStep(application, _, dynamic.from(msg))
+          |> lustre.dispatch()
+          |> dispatch()
 
-        new_state
-      }
-    })
+          new_state
+        }
+      })
+    }
   })
 }
 
 fn init(_) {
   colors.choose_color_scheme()
   |> Model(
-    count: 1,
-    steps: [],
+    debuggers: [],
+    frozen: False,
     opened: False,
     color_scheme: _,
-    dispatcher: fn(_) { effect.none() },
-    frozen: False,
-    selected_step: option.None,
+    selected_debugger: option.None,
   )
   |> pair.new(effect.none())
 }
 
-fn update(model: Model(model, msg), msg: Msg(model, msg)) {
+fn update(model: Model, msg: Msg) {
   case msg {
     msg.ToggleOpen -> #(Model(..model, opened: !model.opened), effect.none())
 
-    msg.Restart -> {
-      model.steps
-      |> list.first()
-      |> result.map(fn(item) { model.dispatcher(item.model) })
-      |> result.unwrap(effect.none())
-      |> pair.new(Model(..model, frozen: False, selected_step: option.None), _)
+    msg.Restart(debugger_) -> {
+      let restart_effect =
+        model.debuggers
+        |> debugger_.get(debugger_)
+        |> result.then(fn(d) {
+          d.steps
+          |> list.first()
+          |> result.map(fn(item) { d.dispatcher(item.model) })
+        })
+        |> result.unwrap(effect.none())
+
+      model.debuggers
+      |> debugger_.replace(debugger_, debugger_.unselect)
+      |> fn(ds) { Model(..model, frozen: False, debuggers: ds) }
+      |> pair.new(restart_effect)
     }
 
     msg.UpdateColorScheme(cs) ->
       Model(..model, color_scheme: cs)
       |> pair.new(colors.save_color_scheme(cs))
 
-    msg.AddApplication(dispatcher) ->
-      Model(..model, dispatcher: dispatcher)
+    msg.AddApplication(debugger_, dispatcher) ->
+      model.debuggers
+      |> list.key_set(debugger_, debugger_.init(dispatcher))
+      |> fn(d) {
+        let selected = option.or(model.selected_debugger, Some(debugger_))
+        Model(..model, debuggers: d, selected_debugger: selected)
+      }
       |> pair.new(effect.none())
 
-    msg.BackToStep(item) -> {
-      option.Some(item.index)
-      |> fn(s) { Model(..model, frozen: True, selected_step: s) }
-      |> pair.new(model.dispatcher(item.model))
+    msg.BackToStep(debugger_, item) -> {
+      let selected_step = option.Some(item.index)
+      let model_effect =
+        model.debuggers
+        |> debugger_.get(debugger_)
+        |> result.map(fn(d) { d.dispatcher(item.model) })
+        |> result.unwrap(effect.none())
+
+      model.debuggers
+      |> debugger_.replace(debugger_, debugger_.select(_, selected_step))
+      |> fn(d) { Model(..model, frozen: True, debuggers: d) }
+      |> pair.new(model_effect)
     }
 
     msg.Debug(value) -> {
@@ -106,12 +134,18 @@ fn update(model: Model(model, msg), msg: Msg(model, msg)) {
       #(model, effect.none())
     }
 
-    msg.AddStep(m, m_) -> {
-      let count = model.count
-      let steps = model.steps
-      let step = Step(int.to_string(count), m, m_)
-      let new_model = Model(..model, count: count + 1, steps: [step, ..steps])
-      #(new_model, effect.none())
+    msg.SelectDebugger(debugger_) ->
+      Model(..model, selected_debugger: option.Some(debugger_))
+      |> pair.new(effect.none())
+
+    msg.AddStep(debugger_, m, m_) -> {
+      model.debuggers
+      |> debugger_.replace(debugger_, fn(d) {
+        let step = Step(int.to_string(d.count), m, m_)
+        Debugger(..d, count: d.count + 1, steps: [step, ..d.steps])
+      })
+      |> fn(d) { Model(..model, debuggers: d) }
+      |> pair.new(effect.none())
     }
   }
 }
@@ -128,14 +162,22 @@ fn on_cs_input(content) {
   msg.UpdateColorScheme(cs)
 }
 
-fn view(model: Model(model, msg)) {
+fn on_debugger_input(content) {
+  msg.SelectDebugger(content)
+}
+
+fn view(model: Model) {
   let color_scheme_class = colors.get_color_scheme_class(model.color_scheme)
   let #(panel, header, button_txt) = select_panel_options(model.opened)
   let frozen_panel = case model.frozen {
     True -> s.frozen_panel()
     False -> a.none()
   }
-  h.div([a.class("debugger"), color_scheme_class, frozen_panel], [
+  let debugger_ =
+    model.selected_debugger
+    |> option.unwrap("")
+    |> debugger_.get(model.debuggers, _)
+  h.div([a.class("debugger_"), color_scheme_class, frozen_panel], [
     h.div([panel], [
       h.div([header], [
         h.div([s.flex(), s.debugger_title()], [
@@ -150,22 +192,34 @@ fn view(model: Model(model, msg)) {
                 h.option([a.value(as_s), a.selected(selected)], as_s)
               })
           },
-          case model.frozen {
-            False -> el.none()
-            True ->
-              h.button([s.select_cs(), event.on_click(msg.Restart)], [
+          case model.frozen, model.selected_debugger {
+            True, Some(debugger_) ->
+              h.button([s.select_cs(), event.on_click(msg.Restart(debugger_))], [
                 h.text("Restart"),
               ])
+            _, _ -> el.none()
           },
         ]),
-        h.div([s.actions_section()], [
-          h.div([], [h.text(int.to_string(model.count - 1) <> " Steps")]),
-          h.button([s.toggle_button(), event.on_click(msg.ToggleOpen)], [
-            h.text(button_txt),
-          ]),
-        ]),
+        case debugger_ {
+          Error(_) -> el.none()
+          Ok(debugger_) ->
+            h.div([s.actions_section()], [
+              h.select([event.on_input(on_debugger_input), s.select_cs()], {
+                use #(item, _) <- list.map(model.debuggers)
+                let selected = model.selected_debugger == Some(item)
+                h.option([a.value(item), a.selected(selected)], item)
+              }),
+              h.div([], [h.text(int.to_string(debugger_.count - 1) <> " Steps")]),
+              h.button([s.toggle_button(), event.on_click(msg.ToggleOpen)], [
+                h.text(button_txt),
+              ]),
+            ])
+        },
       ]),
-      v.view_model(model),
+      case debugger_, model.selected_debugger {
+        Ok(debugger_), Some(d) -> v.view_model(model.opened, d, debugger_)
+        _, _ -> el.none()
+      },
     ]),
   ])
 }

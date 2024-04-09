@@ -23,7 +23,6 @@ pub fn setup(options: Options) {
   dispatcher
   |> result.map_error(io.debug)
   |> result.map(ffi.store_dispatcher)
-  |> result.replace(Nil)
 }
 
 pub fn simple() {
