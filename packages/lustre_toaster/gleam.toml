@@ -19,6 +19,7 @@ gleam_stdlib = "~> 0.34 or ~> 1.0"
 lustre = "~> 4.1.2"
 scheduler = {path = "../scheduler"}
 sketch = "~> 1.1.0"
+tardis = {path = "../tardis"}
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

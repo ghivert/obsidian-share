@@ -1,30 +1,41 @@
+import gleam/function
 import gleam/io
 import gleam/list
+import gleam/option
+import gleam/pair
 import gleam/result
-import gleam/option.{None, Some}
 import lustre
 import lustre/effect
+import sketch
+import sketch/options as sketch_options
+import tardis
 import toaster/ffi
 import toaster/lustre/schedule.{schedule}
 import toaster/model/model.{type Model, Model}
 import toaster/options.{type Options}
-import toaster/types.{
-  type Msg, HideToast, NewToast, RemoveToast, ResumeToast, ShowToast, StopToast,
-}
+import toaster/types.{type Msg} as t
 import toaster/view.{view}
 
 pub fn setup(opts: Options) {
   ffi.create_node()
 
-  let up = case opts.debug {
-    Some(middleware) -> middleware(update)
-    None -> update
-  }
+  let #(wrapper, activate) =
+    opts.debug
+    |> option.map(tardis.application(_, "grille-pain"))
+    |> option.map(fn(d) { #(tardis.wrap(_, d), tardis.activate(_, d)) })
+    |> option.unwrap(#(function.identity, function.identity))
+
+  let render =
+    sketch_options.node()
+    |> sketch.lustre_setup()
+    |> result.unwrap(function.identity)
 
   let dispatcher =
     fn(_) { #(model.new(opts.timeout), effect.none()) }
-    |> lustre.application(up, view)
+    |> lustre.application(update, render(view))
+    |> wrapper()
     |> lustre.start("#grille-pain", Nil)
+    |> activate()
 
   dispatcher
   |> result.map_error(io.debug)
@@ -39,31 +50,41 @@ pub fn simple() {
 fn update(model: Model, msg: Msg) {
   let time = model.timeout
   case msg {
-    ShowToast(id) -> #(model.show(model, id), schedule(time, HideToast(id, 0)))
-    RemoveToast(id) -> #(model.remove(model, id), effect.none())
-    StopToast(id) -> #(model.stop(model, id), effect.none())
-    HideToast(id, iteration) ->
+    t.RemoveToast(id) -> #(model.remove(model, id), effect.none())
+    t.StopToast(id) -> #(model.stop(model, id), effect.none())
+
+    t.ShowToast(id) -> {
+      let new_model = model.show(model, id)
+      let eff = schedule(time, t.HideToast(id, 0))
+      #(new_model, eff)
+    }
+
+    t.HideToast(id, iteration) ->
       model.toasts
       |> list.find(fn(toast) { toast.id == id && toast.iteration == iteration })
       |> result.map(fn(toast) {
-        let new_model =
-          model
-          |> model.hide(toast.id)
-          |> model.decrease_bottom(toast.id)
-        #(new_model, schedule(1000, RemoveToast(id)))
+        model
+        |> model.hide(toast.id)
+        |> model.decrease_bottom(toast.id)
+        |> pair.new(schedule(1000, t.RemoveToast(id)))
       })
-      |> result.unwrap(or: #(model, effect.none()))
-    ResumeToast(id) -> {
+      |> result.unwrap(#(model, effect.none()))
+
+    t.ResumeToast(id) -> {
       let new_model = model.resume(model, id)
-      list.find(model.toasts, fn(toast) { toast.id == id })
-      |> result.map(fn(t) { schedule(t.remaining, HideToast(id, t.iteration)) })
+      model.toasts
+      |> list.find(fn(toast) { toast.id == id })
+      |> result.map(fn(t) {
+        schedule(t.remaining, t.HideToast(id, t.iteration))
+      })
       |> result.map(fn(eff) { #(new_model, eff) })
       |> result.unwrap(#(new_model, effect.none()))
     }
-    NewToast(content, level) -> {
+
+    t.NewToast(content, level) -> {
       let old_id = model.id
       let new_model = model.add(model, content, level)
-      #(new_model, schedule(100, ShowToast(old_id)))
+      #(new_model, schedule(100, t.ShowToast(old_id)))
     }
   }
 }

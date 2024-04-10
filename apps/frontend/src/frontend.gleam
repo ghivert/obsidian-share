@@ -5,6 +5,7 @@ import lustre/update
 import sketch
 import sketch/options as sketch_options
 import toaster
+import toaster/lustre/toast
 import toaster/options
 import tardis
 import types
@@ -16,7 +17,7 @@ pub fn main() {
   let assert Ok(_) =
     options.default()
     |> options.timeout(5000)
-    // |> options.debug(toaster_update_middleware)
+    |> options.debug(debugger_)
     |> toaster.setup()
 
   let assert Ok(render) =
@@ -29,8 +30,6 @@ pub fn main() {
     |> tardis.wrap(main)
     |> lustre.start("#app", Nil)
     |> tardis.activate(main)
-  // tardis.wrap(t1, app_dispatch)
-  // tardis.wrap(t2, toaster_dispatch)
 }
 
 fn update(model, msg) {
@@ -39,7 +38,9 @@ fn update(model, msg) {
     types.PerformEffect(effect) -> #(model, effect)
     types.Authenticate(authenticate) ->
       case authenticate {
-        types.SubmitEmailPassword -> update.none(model)
+        types.SubmitEmailPassword ->
+          update.none(model)
+          |> update.add_effect(toast.success("Coucou"))
         types.UpdateEmail(email) ->
           model
           |> types.update_email(email)

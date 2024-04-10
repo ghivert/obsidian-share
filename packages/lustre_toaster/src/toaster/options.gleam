@@ -1,16 +1,8 @@
 import gleam/option.{type Option, None, Some}
-import lustre/effect.{type Effect}
-import toaster/model/model.{type Model}
-import toaster/types.{type Msg}
+import tardis
 
 pub type Options {
-  Options(
-    timeout: Int,
-    debug: Option(
-      fn(fn(Model, Msg) -> #(Model, Effect(Msg))) ->
-        fn(Model, Msg) -> #(Model, Effect(Msg)),
-    ),
-  )
+  Options(timeout: Int, debug: Option(tardis.Instance))
 }
 
 pub fn default() -> Options {

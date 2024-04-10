@@ -14,7 +14,7 @@ packages = [
   { name = "layout", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre", "sketch"], source = "local", path = "../../packages/layout" },
   { name = "lustre", version = "4.1.6", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_json", "gleam_otp", "gleam_stdlib"], source = "local", path = "../../../lustre" },
   { name = "lustre_http", version = "0.5.2", build_tools = ["gleam"], requirements = ["gleam_fetch", "gleam_http", "gleam_javascript", "gleam_json", "gleam_stdlib", "lustre"], otp_app = "lustre_http", source = "hex", outer_checksum = "FB0478CBFA6B16DBE8ECA326DAE2EC15645E04900595EF2C4F039ABFA0512ABA" },
-  { name = "lustre_toaster", version = "1.0.0", build_tools = ["gleam"], requirements = ["birl", "gleam_stdlib", "lustre", "scheduler", "sketch"], source = "local", path = "../../packages/lustre_toaster" },
+  { name = "lustre_toaster", version = "1.0.0", build_tools = ["gleam"], requirements = ["birl", "gleam_stdlib", "lustre", "scheduler", "sketch", "tardis"], source = "local", path = "../../packages/lustre_toaster" },
   { name = "plinth", version = "0.1.13", build_tools = ["gleam"], requirements = ["gleam_javascript", "gleam_json", "gleam_stdlib"], source = "local", path = "../../../plinth" },
   { name = "ranger", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "1566C272B1D141B3BBA38B25CB761EF56E312E79EC0E2DFD4D3C19FB0CC1F98C" },
   { name = "scheduler", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], source = "local", path = "../../packages/scheduler" },
