@@ -1,4 +1,4 @@
-import gleam/option.{type Option}
+import gleam/option.{type Option, Some}
 import tardis/data/colors
 import tardis/data/debugger.{type Debugger}
 
@@ -10,4 +10,9 @@ pub type Model {
     opened: Bool,
     selected_debugger: Option(String),
   )
+}
+
+pub fn optional_set_debugger(model: Model, debugger_: String) {
+  let selected = option.or(model.selected_debugger, Some(debugger_))
+  Model(..model, selected_debugger: selected)
 }

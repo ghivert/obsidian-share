@@ -1,11 +1,12 @@
 import gleam/dynamic.{type Dynamic}
+import gleam/int
 import gleam/list
 import gleam/option.{type Option}
 import gleam/pair
 import gleam/result
 import lustre/effect.{type Effect}
 import tardis/data/msg.{type Msg}
-import tardis/data/step.{type Step}
+import tardis/data/step.{type Step, Step}
 
 pub type Debuggers =
   List(#(String, Debugger))
@@ -47,4 +48,11 @@ pub fn unselect(debugger_: Debugger) {
 
 pub fn select(debugger_: Debugger, step: Option(String)) {
   Debugger(..debugger_, selected_step: step)
+}
+
+pub fn add_step(debugger_: Debugger, model: Dynamic, msg: Dynamic) {
+  let count = debugger_.count
+  let steps = debugger_.steps
+  let step = Step(int.to_string(count), model, msg)
+  Debugger(..debugger_, count: count + 1, steps: [step, ..steps])
 }

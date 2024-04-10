@@ -183,3 +183,9 @@ export function isDarkTheme() {
   const matches = matchMedia('(prefers-color-scheme: dark)')
   return matches.matches
 }
+
+export function addCustomStyles(content) {
+  const stylesheet = new CSSStyleSheet()
+  stylesheet.replace(content)
+  document.adoptedStyleSheets.push(stylesheet)
+}

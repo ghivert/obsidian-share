@@ -7,21 +7,18 @@ import gleam/pair
 import gleam/result
 import lustre.{type Action}
 import lustre/attribute as a
-import lustre/internals/runtime
 import lustre/effect.{type Effect}
 import lustre/element as el
 import lustre/element/html as h
 import lustre/event
-import plinth/browser/element
-import plinth/browser/shadow
-import plinth/browser/document
+import lustre/internals/runtime
 import sketch
 import sketch/options as sketch_options
 import tardis/data/colors
-import tardis/data/debugger.{Debugger} as debugger_
+import tardis/data/debugger as debugger_
 import tardis/data/model.{type Model, Model}
 import tardis/data/msg.{type Msg}
-import tardis/data/step.{type Step, Step}
+import tardis/setup
 import tardis/styles as s
 import tardis/view as v
 
@@ -45,26 +42,8 @@ fn create_model_updater(
   }
 }
 
-fn create_tardis_nodes() {
-  // Instanciate the Shadow DOM wrapper.
-  let div = document.create_element("div")
-  element.append_child(document.body(), div)
-  element.set_attribute(div, "class", "tardis")
-
-  // Instanciate the Shadow DOM lustre node.
-  let root = document.create_element("div")
-  element.set_attribute(root, "id", "tardis-start")
-  let selector: String = dynamic.unsafe_coerce(dynamic.from(root))
-
-  // Instanciate the Shadow DOM itself.
-  let shadow_root = shadow.attach_shadow(div, shadow.Open)
-  shadow.append_child(shadow_root, root)
-
-  #(shadow_root, selector)
-}
-
 pub fn setup() {
-  let #(shadow_root, selector) = create_tardis_nodes()
+  let #(shadow_root, lustre_root) = setup.mount_shadow_node()
 
   // Attach the StyleSheet to the Shadow DOM.
   let assert Ok(render) =
@@ -72,7 +51,7 @@ pub fn setup() {
     |> sketch.lustre_setup()
 
   lustre.application(init, update, render(view))
-  |> lustre.start(selector, Nil)
+  |> lustre.start(lustre_root, Nil)
   |> result.map(fn(dispatch) {
     fn(application: String) {
       #(create_model_updater(application, dispatch), fn(update) {
@@ -133,10 +112,7 @@ fn update(model: Model, msg: Msg) {
     msg.AddApplication(debugger_, dispatcher) ->
       model.debuggers
       |> list.key_set(debugger_, debugger_.init(dispatcher))
-      |> fn(d) {
-        let selected = option.or(model.selected_debugger, Some(debugger_))
-        Model(..model, debuggers: d, selected_debugger: selected)
-      }
+      |> fn(d) { Model(..model, debuggers: d) }
       |> pair.new(effect.none())
 
     msg.BackToStep(debugger_, item) -> {
@@ -164,11 +140,9 @@ fn update(model: Model, msg: Msg) {
 
     msg.AddStep(debugger_, m, m_) -> {
       model.debuggers
-      |> debugger_.replace(debugger_, fn(d) {
-        let step = Step(int.to_string(d.count), m, m_)
-        Debugger(..d, count: d.count + 1, steps: [step, ..d.steps])
-      })
+      |> debugger_.replace(debugger_, debugger_.add_step(_, m, m_))
       |> fn(d) { Model(..model, debuggers: d) }
+      |> model.optional_set_debugger(debugger_)
       |> pair.new(effect.none())
     }
   }
@@ -229,9 +203,15 @@ fn view(model: Model) {
           Ok(debugger_) ->
             h.div([s.actions_section()], [
               h.select([event.on_input(on_debugger_input), s.select_cs()], {
-                use #(item, _) <- list.map(model.debuggers)
-                let selected = model.selected_debugger == Some(item)
-                h.option([a.value(item), a.selected(selected)], item)
+                list.filter(model.debuggers, fn(debugger_) {
+                  let steps = pair.second(debugger_).steps
+                  !list.is_empty(steps)
+                })
+                |> list.map(fn(i) {
+                  let #(item, _) = i
+                  let selected = model.selected_debugger == Some(item)
+                  h.option([a.value(item), a.selected(selected)], item)
+                })
               }),
               h.div([], [h.text(int.to_string(debugger_.count - 1) <> " Steps")]),
               h.button([s.toggle_button(), event.on_click(msg.ToggleOpen)], [
