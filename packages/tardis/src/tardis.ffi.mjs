@@ -189,3 +189,10 @@ export function addCustomStyles(content) {
   stylesheet.replace(content)
   document.adoptedStyleSheets.push(stylesheet)
 }
+
+export function updateLustre(application, initMapper, updateMapper) {
+  return application.withFields({
+    update: updateMapper(application.update),
+    init: initMapper(application.init)
+  })
+}

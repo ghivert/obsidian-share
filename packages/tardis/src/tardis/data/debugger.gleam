@@ -1,7 +1,7 @@
 import gleam/dynamic.{type Dynamic}
 import gleam/int
 import gleam/list
-import gleam/option.{type Option}
+import gleam/option.{type Option, None, Some}
 import gleam/pair
 import gleam/result
 import lustre/effect.{type Effect}
@@ -15,13 +15,17 @@ pub type Debugger {
   Debugger(
     count: Int,
     steps: List(Step),
-    dispatcher: fn(Dynamic) -> Effect(Msg),
+    dispatcher: Option(fn(Dynamic) -> Effect(Msg)),
     selected_step: Option(String),
   )
 }
 
-pub fn init(dispatcher) {
-  Debugger(1, steps: [], dispatcher: dispatcher, selected_step: option.None)
+pub fn init() {
+  Debugger(1, steps: [], dispatcher: None, selected_step: option.None)
+}
+
+pub fn add_dispatcher(debugger_: Debugger, dispatcher) {
+  Debugger(..debugger_, dispatcher: Some(dispatcher))
 }
 
 pub fn replace(
@@ -31,9 +35,10 @@ pub fn replace(
 ) -> Debuggers {
   debuggers
   |> list.find(fn(item) { pair.first(item) == debugger_ })
-  |> result.map(fn(d) { mapper(pair.second(d)) })
-  |> result.map(fn(d) { list.key_set(debuggers, debugger_, d) })
-  |> result.unwrap(debuggers)
+  |> result.unwrap(#(debugger_, init()))
+  |> pair.second()
+  |> mapper()
+  |> list.key_set(debuggers, debugger_, _)
 }
 
 pub fn get(debuggers: Debuggers, debugger_: String) {

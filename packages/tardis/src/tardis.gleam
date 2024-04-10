@@ -1,11 +1,12 @@
 import gleam/dynamic.{type Dynamic}
+import gleam/function
 import gleam/int
 import gleam/io
 import gleam/list
 import gleam/option.{Some}
 import gleam/pair
 import gleam/result
-import lustre.{type Action}
+import lustre.{type Action, type App}
 import lustre/attribute as a
 import lustre/effect.{type Effect}
 import lustre/element as el
@@ -22,6 +23,64 @@ import tardis/setup
 import tardis/styles as s
 import tardis/view as v
 
+type Middleware =
+  fn(Dynamic, Dynamic) -> Nil
+
+pub opaque type Instance {
+  Instance(dispatch: fn(Action(Msg, lustre.ClientSpa)) -> Nil)
+}
+
+pub opaque type Tardis {
+  Tardis(#(fn(Dynamic) -> Nil, Middleware))
+}
+
+fn wrap_init(middleware: Middleware) {
+  fn(init) {
+    fn(flags) {
+      let new_state = init(flags)
+      new_state
+      |> pair.first()
+      |> dynamic.from()
+      |> middleware(dynamic.from("Init"))
+      new_state
+    }
+  }
+}
+
+fn wrap_update(middleware: Middleware) {
+  fn(update) {
+    fn(model, msg) {
+      let new_state = update(model, msg)
+      new_state
+      |> pair.first()
+      |> dynamic.from()
+      |> middleware(dynamic.from(msg))
+      new_state
+    }
+  }
+}
+
+pub fn wrap(application: App(a, b, c), tardis: Tardis) {
+  let Tardis(#(_, middleware)) = tardis
+  update_lustre(application, wrap_init(middleware), wrap_update(middleware))
+}
+
+pub fn activate(result: Result(fn(Action(a, b)) -> Nil, c), tardis: Tardis) {
+  use dispatch <- result.map(result)
+  let Tardis(#(dispatcher, _)) = tardis
+  dispatcher(dynamic.from(dispatch))
+  dispatch
+}
+
+@external(javascript, "./tardis.ffi.mjs", "updateLustre")
+fn update_lustre(
+  application: App(a, b, c),
+  init_mapper: fn(fn(flags) -> #(model, Effect(msg))) ->
+    fn(flags) -> #(model, Effect(msg)),
+  update_mapper: fn(fn(model, msg) -> #(model, Effect(msg))) ->
+    fn(model, msg) -> #(model, Effect(msg)),
+) -> App(a, b, c)
+
 fn create_model_updater(
   application: String,
   dispatch: fn(Action(Msg, c)) -> Nil,
@@ -29,7 +88,6 @@ fn create_model_updater(
   fn(dispatcher: Dynamic) {
     fn(model: Dynamic) -> Effect(Msg) {
       effect.from(fn(_) {
-        io.debug(dynamic.unsafe_coerce(dispatcher))
         model
         |> dynamic.from()
         |> runtime.UpdateModel()
@@ -46,30 +104,39 @@ pub fn setup() {
   let #(shadow_root, lustre_root) = setup.mount_shadow_node()
 
   // Attach the StyleSheet to the Shadow DOM.
-  let assert Ok(render) =
+  let renderer =
     sketch_options.shadow(shadow_root)
     |> sketch.lustre_setup()
 
-  lustre.application(init, update, render(view))
-  |> lustre.start(lustre_root, Nil)
-  |> result.map(fn(dispatch) {
-    fn(application: String) {
-      #(create_model_updater(application, dispatch), fn(update) {
-        fn(model, msg) -> #(model, effect.Effect(msg)) {
-          let new_state = update(model, msg)
-
-          // Keep model to display it in Tardis
-          pair.first(new_state)
-          |> dynamic.from()
-          |> msg.AddStep(application, _, dynamic.from(msg))
-          |> lustre.dispatch()
-          |> dispatch()
-
-          new_state
-        }
-      })
-    }
+  renderer
+  |> result.map(fn(r) { lustre.application(init, update, r(view)) })
+  |> result.map_error(fn(error) {
+    io.debug("Unable to start sketch. Check your configuration.")
+    io.debug(error)
+    lustre.NotErlang
   })
+  |> result.then(lustre.start(_, lustre_root, Nil))
+  |> result.map(fn(dispatch) { Instance(dispatch) })
+}
+
+pub fn single(name: String) {
+  setup()
+  |> result.map(application(_, name))
+}
+
+fn step_adder(instance: Instance, name: String) {
+  fn(model, msg) {
+    model
+    |> msg.AddStep(name, _, msg)
+    |> lustre.dispatch()
+    |> instance.dispatch()
+  }
+}
+
+pub fn application(instance: Instance, name: String) {
+  let updater = create_model_updater(name, instance.dispatch)
+  let adder = step_adder(instance, name)
+  Tardis(#(updater, adder))
 }
 
 fn init(_) {
@@ -95,7 +162,11 @@ fn update(model: Model, msg: Msg) {
         |> result.then(fn(d) {
           d.steps
           |> list.first()
-          |> result.map(fn(item) { d.dispatcher(item.model) })
+          |> result.then(fn(item) {
+            d.dispatcher
+            |> option.map(function.apply1(_, item.model))
+            |> option.to_result(Nil)
+          })
         })
         |> result.unwrap(effect.none())
 
@@ -111,7 +182,7 @@ fn update(model: Model, msg: Msg) {
 
     msg.AddApplication(debugger_, dispatcher) ->
       model.debuggers
-      |> list.key_set(debugger_, debugger_.init(dispatcher))
+      |> debugger_.replace(debugger_, debugger_.add_dispatcher(_, dispatcher))
       |> fn(d) { Model(..model, debuggers: d) }
       |> pair.new(effect.none())
 
@@ -120,7 +191,11 @@ fn update(model: Model, msg: Msg) {
       let model_effect =
         model.debuggers
         |> debugger_.get(debugger_)
-        |> result.map(fn(d) { d.dispatcher(item.model) })
+        |> result.then(fn(d) {
+          d.dispatcher
+          |> option.map(function.apply1(_, item.model))
+          |> option.to_result(Nil)
+        })
         |> result.unwrap(effect.none())
 
       model.debuggers
