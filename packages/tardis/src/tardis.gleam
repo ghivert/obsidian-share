@@ -96,8 +96,8 @@ fn update(model: Model, msg: Msg) {
     msg.Restart(debugger_) -> {
       let restart_effect =
         model.debuggers
-        |> debugger_.get(debugger_)
-        |> result.then(fn(d) {
+        |> list.filter_map(fn(d_) {
+          let d = pair.second(d_)
           d.steps
           |> list.first()
           |> result.then(fn(item) {
@@ -106,7 +106,7 @@ fn update(model: Model, msg: Msg) {
             |> option.to_result(Nil)
           })
         })
-        |> result.unwrap(effect.none())
+        |> effect.batch()
 
       model.debuggers
       |> debugger_.replace(debugger_, debugger_.unselect)
