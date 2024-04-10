@@ -1,4 +1,4 @@
-import toaster/model/toast.{type Level}
+import grille_pain/model/toast.{type Level}
 
 pub type Msg {
   NewToast(String, Level)

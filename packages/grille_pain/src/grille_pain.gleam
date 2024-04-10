@@ -9,12 +9,12 @@ import lustre/effect
 import sketch
 import sketch/options as sketch_options
 import tardis
-import toaster/ffi
-import toaster/lustre/schedule.{schedule}
-import toaster/model/model.{type Model, Model}
-import toaster/options.{type Options}
-import toaster/types.{type Msg} as t
-import toaster/view.{view}
+import grille_pain/ffi
+import grille_pain/lustre/schedule.{schedule}
+import grille_pain/model/model.{type Model, Model}
+import grille_pain/options.{type Options}
+import grille_pain/types.{type Msg} as t
+import grille_pain/view.{view}
 
 pub fn setup(opts: Options) {
   ffi.create_node()

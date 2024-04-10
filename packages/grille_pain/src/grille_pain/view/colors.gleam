@@ -1,5 +1,7 @@
-import toaster/ffi
-import toaster/model/toast.{type Level, Error, Info, Standard, Success, Warning}
+import grille_pain/ffi
+import grille_pain/model/toast.{
+  type Level, Error, Info, Standard, Success, Warning,
+}
 
 pub const info = "#3498db"
 

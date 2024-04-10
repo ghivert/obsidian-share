@@ -1,8 +1,8 @@
 import birl
 import birl/duration.{Duration}
 import gleam/list
-import toaster/ffi
-import toaster/model/toast.{type Level, type Toast, Toast}
+import grille_pain/ffi
+import grille_pain/model/toast.{type Level, type Toast, Toast}
 
 pub type Model {
   Model(toasts: List(Toast), id: Int, timeout: Int)

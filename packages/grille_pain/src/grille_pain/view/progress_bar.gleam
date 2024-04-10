@@ -3,8 +3,8 @@ import gleam/string
 import lustre/element/html
 import sketch
 import sketch/size.{px}
-import toaster/model/toast.{type Level, type Toast}
-import toaster/view/colors
+import grille_pain/model/toast.{type Level, type Toast}
+import grille_pain/view/colors
 
 pub fn view(toast: Toast) {
   html.div(
@@ -33,15 +33,15 @@ fn pb_animation(duration: Int) {
 
 fn pb_background_color(level: Level) {
   let back_color = colors.progress_bar_from_level(level)
-  let background = "var(--toaster-info-progress-bar, " <> back_color <> ")"
-  string.join(["toaster", "pb", "background", back_color], "-")
+  let background = "var(--grille_pain-info-progress-bar, " <> back_color <> ")"
+  string.join(["grille_pain", "pb", "background", back_color], "-")
   |> sketch.dynamic([sketch.background(background)])
   |> sketch.to_lustre()
 }
 
 fn pb_play_state(running: Bool) {
   let running_str = toast.running_to_string(running)
-  string.join(["toaster", "pb", "play-state", running_str], "-")
+  string.join(["grille_pain", "pb", "play-state", running_str], "-")
   |> sketch.dynamic([sketch.animation_play_state(running_str)])
   |> sketch.to_lustre()
 }

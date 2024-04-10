@@ -4,9 +4,9 @@ import lustre/effect
 import lustre/update
 import sketch
 import sketch/options as sketch_options
-import toaster
-import toaster/lustre/toast
-import toaster/options
+import grille_pain
+import grille_pain/lustre/toast
+import grille_pain/options
 import tardis
 import types
 
@@ -18,7 +18,7 @@ pub fn main() {
     options.default()
     |> options.timeout(5000)
     |> options.debug(debugger_)
-    |> toaster.setup()
+    |> grille_pain.setup()
 
   let assert Ok(render) =
     sketch_options.document()

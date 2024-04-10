@@ -11,10 +11,10 @@ typescript_declarations = true
 [dependencies]
 gleam_javascript = "~> 0.8"
 gleam_stdlib = "~> 0.34 or ~> 1.0"
+grille_pain = {path = "../../packages/grille_pain"}
 layout = {path = "../../packages/layout"}
 lustre = {path = "../../../lustre"}
 lustre_http = "~> 0.5"
-lustre_toaster = {path = "../../packages/lustre_toaster"}
 plinth = {path = "../../../plinth"}
 sketch = {path = "../../../sketch"}
 tardis = {path = "../../packages/tardis"}

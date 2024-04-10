@@ -1,13 +1,15 @@
 import lustre
-import toaster/ffi
-import toaster/model/toast.{type Level, Error, Info, Standard, Success, Warning}
-import toaster/types.{NewToast}
+import grille_pain/ffi
+import grille_pain/model/toast.{
+  type Level, Error, Info, Standard, Success, Warning,
+}
+import grille_pain/types.{NewToast}
 
 fn dispatch_toast(content: String, level: Level) {
-  let toaster_dispatch = ffi.dispatcher()
+  let grille_pain_dispatch = ffi.dispatcher()
   NewToast(content, level)
   |> lustre.dispatch()
-  |> toaster_dispatch()
+  |> grille_pain_dispatch()
 }
 
 pub fn info(content: String) {

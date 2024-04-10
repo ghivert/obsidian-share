@@ -8,11 +8,11 @@ import lustre/element/html
 import lustre/event
 import sketch
 import sketch/size.{px}
-import toaster/model/model.{type Model, Model}
-import toaster/model/toast.{type Level, type Toast}
-import toaster/types.{type Msg, HideToast, ResumeToast, StopToast}
-import toaster/view/colors
-import toaster/view/progress_bar
+import grille_pain/model/model.{type Model, Model}
+import grille_pain/model/toast.{type Level, type Toast}
+import grille_pain/types.{type Msg, HideToast, ResumeToast, StopToast}
+import grille_pain/view/colors
+import grille_pain/view/progress_bar
 
 pub fn view(model: Model) {
   let Model(toasts, _, _) = model
@@ -52,11 +52,12 @@ fn wrapper_position_style(toast: Toast) {
   |> sketch.dynamic([
     sketch.padding(px(12)),
     sketch.position("fixed"),
-    sketch.bottom(px(min_bot)),
-    sketch.transition("right 0.7s, bottom 0.7s"),
+    sketch.top(px(min_bot)),
+    sketch.transition("right 0.7s, top 0.7s"),
     case toast.displayed {
       True -> sketch.right(px(0))
-      False -> sketch.right_("calc(-1 * var(--toaster-width, 320px) - 100px)")
+      False ->
+        sketch.right_("calc(-1 * var(--grille_pain-width, 320px) - 100px)")
     },
   ])
   |> sketch.to_lustre()
@@ -68,9 +69,9 @@ fn wrapper_dom_classes(toast: Toast) {
     False -> "hidden"
   }
   attribute.classes([
-    #("toaster-toast", True),
-    #("toaster-toast-" <> int.to_string(toast.id), True),
-    #("toaster-toast-" <> displayed, True),
+    #("grille_pain-toast", True),
+    #("grille_pain-toast-" <> int.to_string(toast.id), True),
+    #("grille_pain-toast-" <> displayed, True),
   ])
 }
 
@@ -79,11 +80,11 @@ fn toast_class() {
     sketch.display("flex"),
     sketch.flex_direction("column"),
     // Sizes
-    sketch.width_("var(--toaster-width, 320px)"),
+    sketch.width_("var(--grille_pain-width, 320px)"),
     sketch.min_height_("var(--toast-min-height, 64px)"),
     sketch.max_height_("var(--toast-max-height, 800px)"),
     // Spacings
-    sketch.border_radius_("var(--toaster-border-radius, 6px)"),
+    sketch.border_radius_("var(--grille_pain-border-radius, 6px)"),
     // Colors
     sketch.box_shadow("0px 4px 12px rgba(0, 0, 0, 0.1)"),
     // Animation
@@ -94,11 +95,13 @@ fn toast_class() {
 
 fn toast_colors(level: Level) {
   let #(background, text_color) = colors.from_level(level)
-  let id = string.join(["toaster", background, text_color], "-")
+  let id = string.join(["grille_pain", background, text_color], "-")
   sketch.to_lustre(
     sketch.dynamic(id, [
-      sketch.background("var(--toaster-info-background, " <> background <> ")"),
-      sketch.color("var(--toaster-info-text-color, " <> text_color <> ")"),
+      sketch.background(
+        "var(--grille_pain-info-background, " <> background <> ")",
+      ),
+      sketch.color("var(--grille_pain-info-text-color, " <> text_color <> ")"),
     ]),
   )
 }

@@ -1,9 +1,9 @@
 import lustre/effect
-import toaster/toast
+import grille_pain/toast
 
-fn dispatch(content: String, toaster: fn(String) -> Nil) {
+fn dispatch(content: String, grille_pain: fn(String) -> Nil) {
   use _dispatch <- effect.from()
-  toaster(content)
+  grille_pain(content)
 }
 
 pub fn info(content: String) {
