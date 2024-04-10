@@ -15,8 +15,9 @@ layout = {path = "../../packages/layout"}
 lustre = {path = "../../../lustre"}
 lustre_http = "~> 0.5"
 lustre_toaster = {path = "../../packages/lustre_toaster"}
-plinth = "~> 0.1"
-sketch = "~> 1.0.0"
+plinth = {path = "../../../plinth"}
+sketch = {path = "../../../sketch"}
+tardis = {path = "../../packages/tardis"}
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

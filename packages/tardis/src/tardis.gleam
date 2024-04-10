@@ -12,6 +12,9 @@ import lustre/effect.{type Effect}
 import lustre/element as el
 import lustre/element/html as h
 import lustre/event
+import plinth/browser/element
+import plinth/browser/shadow
+import plinth/browser/document
 import sketch
 import sketch/options as sketch_options
 import tardis/data/colors
@@ -42,13 +45,34 @@ fn create_model_updater(
   }
 }
 
+fn create_tardis_nodes() {
+  // Instanciate the Shadow DOM wrapper.
+  let div = document.create_element("div")
+  element.append_child(document.body(), div)
+  element.set_attribute(div, "class", "tardis")
+
+  // Instanciate the Shadow DOM lustre node.
+  let root = document.create_element("div")
+  element.set_attribute(root, "id", "tardis-start")
+  let selector: String = dynamic.unsafe_coerce(dynamic.from(root))
+
+  // Instanciate the Shadow DOM itself.
+  let shadow_root = shadow.attach_shadow(div, shadow.Open)
+  shadow.append_child(shadow_root, root)
+
+  #(shadow_root, selector)
+}
+
 pub fn setup() {
+  let #(shadow_root, selector) = create_tardis_nodes()
+
+  // Attach the StyleSheet to the Shadow DOM.
   let assert Ok(render) =
-    sketch_options.node()
+    sketch_options.shadow(shadow_root)
     |> sketch.lustre_setup()
 
   lustre.application(init, update, render(view))
-  |> lustre.start("#tardis", Nil)
+  |> lustre.start(selector, Nil)
   |> result.map(fn(dispatch) {
     fn(application: String) {
       #(create_model_updater(application, dispatch), fn(update) {

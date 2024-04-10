@@ -15,10 +15,11 @@ packages = [
   { name = "lustre", version = "4.1.6", build_tools = ["gleam"], requirements = ["gleam_erlang", "gleam_json", "gleam_otp", "gleam_stdlib"], source = "local", path = "../../../lustre" },
   { name = "lustre_http", version = "0.5.2", build_tools = ["gleam"], requirements = ["gleam_fetch", "gleam_http", "gleam_javascript", "gleam_json", "gleam_stdlib", "lustre"], otp_app = "lustre_http", source = "hex", outer_checksum = "FB0478CBFA6B16DBE8ECA326DAE2EC15645E04900595EF2C4F039ABFA0512ABA" },
   { name = "lustre_toaster", version = "1.0.0", build_tools = ["gleam"], requirements = ["birl", "gleam_stdlib", "lustre", "scheduler", "sketch"], source = "local", path = "../../packages/lustre_toaster" },
-  { name = "plinth", version = "0.1.13", build_tools = ["gleam"], requirements = ["gleam_javascript", "gleam_json", "gleam_stdlib"], otp_app = "plinth", source = "hex", outer_checksum = "F4E20F8739D4D704BB69C8336B5E178D346EB69775BF263DC15B2A77B113A63C" },
+  { name = "plinth", version = "0.1.13", build_tools = ["gleam"], requirements = ["gleam_javascript", "gleam_json", "gleam_stdlib"], source = "local", path = "../../../plinth" },
   { name = "ranger", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "1566C272B1D141B3BBA38B25CB761EF56E312E79EC0E2DFD4D3C19FB0CC1F98C" },
   { name = "scheduler", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], source = "local", path = "../../packages/scheduler" },
-  { name = "sketch", version = "1.0.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre"], otp_app = "sketch", source = "hex", outer_checksum = "026EBEF74FE76947F1ADD5FB030FF79010C73176F4798249FEF9659224C12341" },
+  { name = "sketch", version = "1.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre", "plinth"], source = "local", path = "../../../sketch" },
+  { name = "tardis", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre", "plinth", "sketch"], source = "local", path = "../../packages/tardis" },
   { name = "thoas", version = "0.4.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "4918D50026C073C4AB1388437132C77A6F6F7C8AC43C60C13758CC0ADCE2134E" },
 ]
 
@@ -30,5 +31,6 @@ layout = { path = "../../packages/layout" }
 lustre = { path = "../../../lustre" }
 lustre_http = { version = "~> 0.5" }
 lustre_toaster = { path = "../../packages/lustre_toaster" }
-plinth = { version = "~> 0.1" }
-sketch = { version = "~> 1.0.0" }
+plinth = { path = "../../../plinth" }
+sketch = { path = "../../../sketch" }
+tardis = { path = "../../packages/tardis" }
