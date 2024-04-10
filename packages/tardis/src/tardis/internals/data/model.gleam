@@ -1,6 +1,6 @@
 import gleam/option.{type Option, Some}
-import tardis/data/colors
-import tardis/data/debugger.{type Debugger}
+import tardis/internals/data/colors
+import tardis/internals/data/debugger.{type Debugger}
 
 pub type Model {
   Model(

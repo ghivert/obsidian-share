@@ -1,6 +1,7 @@
 import gleam/io
 import gleam/list
 import gleam/result
+import gleam/option.{None, Some}
 import lustre
 import lustre/effect
 import toaster/ffi
@@ -12,12 +13,17 @@ import toaster/types.{
 }
 import toaster/view.{view}
 
-pub fn setup(options: Options) {
+pub fn setup(opts: Options) {
   ffi.create_node()
 
+  let up = case opts.debug {
+    Some(middleware) -> middleware(update)
+    None -> update
+  }
+
   let dispatcher =
-    fn(_) { #(model.new(options), effect.none()) }
-    |> lustre.application(update, view)
+    fn(_) { #(model.new(opts.timeout), effect.none()) }
+    |> lustre.application(up, view)
     |> lustre.start("#grille-pain", Nil)
 
   dispatcher
@@ -26,11 +32,12 @@ pub fn setup(options: Options) {
 }
 
 pub fn simple() {
-  setup(options.default())
+  options.default()
+  |> setup()
 }
 
 fn update(model: Model, msg: Msg) {
-  let time = model.options.timeout
+  let time = model.timeout
   case msg {
     ShowToast(id) -> #(model.show(model, id), schedule(time, HideToast(id, 0)))
     RemoveToast(id) -> #(model.remove(model, id), effect.none())

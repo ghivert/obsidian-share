@@ -23,7 +23,7 @@ pub type Level {
   Success
 }
 
-@external(javascript, "../../lustre_toaster_ffi.mjs", "computeBottomPosition")
+@external(javascript, "../../toaster.ffi.mjs", "computeBottomPosition")
 fn compute_bottom_position() -> Int
 
 pub fn new(id: Int, content: String, level: Level, animation_duration: Int) {

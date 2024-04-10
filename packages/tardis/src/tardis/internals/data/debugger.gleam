@@ -5,8 +5,8 @@ import gleam/option.{type Option, None, Some}
 import gleam/pair
 import gleam/result
 import lustre/effect.{type Effect}
-import tardis/data/msg.{type Msg}
-import tardis/data/step.{type Step, Step}
+import tardis/internals/data/msg.{type Msg}
+import tardis/internals/data/step.{type Step, Step}
 
 pub type Debuggers =
   List(#(String, Debugger))

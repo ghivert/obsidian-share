@@ -19,8 +19,8 @@ pub type Data {
   DataObject(String, List(#(Data, Data)))
 }
 
-@external(javascript, "../tardis.ffi.mjs", "inspect")
+@external(javascript, "../../tardis.ffi.mjs", "inspect")
 pub fn inspect(value: a) -> Data
 
-@external(javascript, "../tardis.ffi.mjs", "stringify")
+@external(javascript, "../../tardis.ffi.mjs", "stringify")
 pub fn stringify(value: a) -> String

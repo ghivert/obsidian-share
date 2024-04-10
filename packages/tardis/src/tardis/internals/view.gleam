@@ -5,11 +5,11 @@ import gleam/string
 import lustre/element.{type Element}
 import lustre/element/html as h
 import lustre/event
-import tardis/data.{type Data}
-import tardis/data/debugger.{type Debugger}
-import tardis/data/msg.{type Msg}
-import tardis/data/step.{type Step, Step}
-import tardis/styles as s
+import tardis/internals/data.{type Data}
+import tardis/internals/data/debugger.{type Debugger}
+import tardis/internals/data/msg.{type Msg}
+import tardis/internals/data/step.{type Step, Step}
+import tardis/internals/styles as s
 
 pub fn view_model(opened: Bool, debugger_: String, model: Debugger) {
   let selected = model.selected_step

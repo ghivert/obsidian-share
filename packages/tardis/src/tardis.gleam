@@ -8,23 +8,19 @@ import gleam/pair
 import gleam/result
 import lustre.{type Action, type App}
 import lustre/attribute as a
-import lustre/effect.{type Effect}
+import lustre/effect
 import lustre/element as el
 import lustre/element/html as h
 import lustre/event
-import lustre/internals/runtime
 import sketch
 import sketch/options as sketch_options
-import tardis/data/colors
-import tardis/data/debugger as debugger_
-import tardis/data/model.{type Model, Model}
-import tardis/data/msg.{type Msg}
-import tardis/setup
-import tardis/styles as s
-import tardis/view as v
-
-type Middleware =
-  fn(Dynamic, Dynamic) -> Nil
+import tardis/internals/data/colors
+import tardis/internals/data/debugger as debugger_
+import tardis/internals/data/model.{type Model, Model}
+import tardis/internals/data/msg.{type Msg}
+import tardis/internals/setup.{type Middleware}
+import tardis/internals/styles as s
+import tardis/internals/view as v
 
 pub opaque type Instance {
   Instance(dispatch: fn(Action(Msg, lustre.ClientSpa)) -> Nil)
@@ -34,35 +30,13 @@ pub opaque type Tardis {
   Tardis(#(fn(Dynamic) -> Nil, Middleware))
 }
 
-fn wrap_init(middleware: Middleware) {
-  fn(init) {
-    fn(flags) {
-      let new_state = init(flags)
-      new_state
-      |> pair.first()
-      |> dynamic.from()
-      |> middleware(dynamic.from("Init"))
-      new_state
-    }
-  }
-}
-
-fn wrap_update(middleware: Middleware) {
-  fn(update) {
-    fn(model, msg) {
-      let new_state = update(model, msg)
-      new_state
-      |> pair.first()
-      |> dynamic.from()
-      |> middleware(dynamic.from(msg))
-      new_state
-    }
-  }
-}
-
 pub fn wrap(application: App(a, b, c), tardis: Tardis) {
   let Tardis(#(_, middleware)) = tardis
-  update_lustre(application, wrap_init(middleware), wrap_update(middleware))
+  setup.update_lustre(
+    application,
+    setup.wrap_init(middleware),
+    setup.wrap_update(middleware),
+  )
 }
 
 pub fn activate(result: Result(fn(Action(a, b)) -> Nil, c), tardis: Tardis) {
@@ -70,34 +44,6 @@ pub fn activate(result: Result(fn(Action(a, b)) -> Nil, c), tardis: Tardis) {
   let Tardis(#(dispatcher, _)) = tardis
   dispatcher(dynamic.from(dispatch))
   dispatch
-}
-
-@external(javascript, "./tardis.ffi.mjs", "updateLustre")
-fn update_lustre(
-  application: App(a, b, c),
-  init_mapper: fn(fn(flags) -> #(model, Effect(msg))) ->
-    fn(flags) -> #(model, Effect(msg)),
-  update_mapper: fn(fn(model, msg) -> #(model, Effect(msg))) ->
-    fn(model, msg) -> #(model, Effect(msg)),
-) -> App(a, b, c)
-
-fn create_model_updater(
-  application: String,
-  dispatch: fn(Action(Msg, c)) -> Nil,
-) {
-  fn(dispatcher: Dynamic) {
-    fn(model: Dynamic) -> Effect(Msg) {
-      effect.from(fn(_) {
-        model
-        |> dynamic.from()
-        |> runtime.UpdateModel()
-        |> dynamic.unsafe_coerce(dispatcher)
-      })
-    }
-    |> msg.AddApplication(application, _)
-    |> lustre.dispatch()
-    |> dispatch()
-  }
 }
 
 pub fn setup() {
@@ -124,18 +70,10 @@ pub fn single(name: String) {
   |> result.map(application(_, name))
 }
 
-fn step_adder(instance: Instance, name: String) {
-  fn(model, msg) {
-    model
-    |> msg.AddStep(name, _, msg)
-    |> lustre.dispatch()
-    |> instance.dispatch()
-  }
-}
-
 pub fn application(instance: Instance, name: String) {
-  let updater = create_model_updater(name, instance.dispatch)
-  let adder = step_adder(instance, name)
+  let dispatch = instance.dispatch
+  let updater = setup.create_model_updater(dispatch, name)
+  let adder = setup.step_adder(dispatch, name)
   Tardis(#(updater, adder))
 }
 

@@ -1,4 +1,3 @@
-import gleam/dynamic
 import views/layout.{main_layout}
 import lustre
 import lustre/effect
@@ -11,26 +10,27 @@ import tardis
 import types
 
 pub fn main() {
-  let assert Ok(config) = tardis.setup()
-  let #(app_config, app_update_middleware) = config("app")
-  let #(toaster_config, toaster_update_middleware) = config("toaster")
+  let assert Ok(debugger_) = tardis.setup()
+  let main = tardis.application(debugger_, "main")
 
-  let assert Ok(toaster_dispatch) =
+  let assert Ok(_) =
     options.default()
     |> options.timeout(5000)
+    // |> options.debug(toaster_update_middleware)
     |> toaster.setup()
 
   let assert Ok(render) =
     sketch_options.document()
     |> sketch.lustre_setup()
 
-  let assert Ok(app_dispatch) =
+  let assert Ok(_) =
     fn(_) { #(types.init(), effect.none()) }
-    |> lustre.application(app_update_middleware(update), render(main_layout))
+    |> lustre.application(update, render(main_layout))
+    |> tardis.wrap(main)
     |> lustre.start("#app", Nil)
-
-  app_config(dynamic.from(app_dispatch))
-  toaster_config(dynamic.from(toaster_dispatch))
+    |> tardis.activate(main)
+  // tardis.wrap(t1, app_dispatch)
+  // tardis.wrap(t2, toaster_dispatch)
 }
 
 fn update(model, msg) {

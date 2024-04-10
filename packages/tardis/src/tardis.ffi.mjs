@@ -18,7 +18,7 @@ import {
   DataString,
   DataTuple,
   DataUtfCodepoint,
-} from './tardis/data.mjs'
+} from './tardis/internals/data.mjs'
 
 export function toString(data) {
   return inspect(data)
