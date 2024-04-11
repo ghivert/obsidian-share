@@ -18,6 +18,7 @@ pub fn view_model(opened: Bool, debugger_: String, model: Debugger) {
     True ->
       element.keyed(h.div([s.body()], _), {
         model.steps
+        |> list.take(100)
         |> list.map(fn(i) { #(i.index, view_step(debugger_, selected, i)) })
         |> list.prepend(#("header", view_grid_header(opened, model)))
       })
@@ -86,6 +87,39 @@ fn view_data(data: Data, indent i: Int, prefix p: String) -> List(Element(Msg)) 
   }
 }
 
+fn count_data(data: Data) {
+  case data {
+    data.DataNil -> 1
+    data.DataBool(_) -> 1
+    data.DataConstant(_) -> 1
+    data.DataBitArray(_) -> 1
+    data.DataUtfCodepoint(_) -> 1
+    data.DataString(_) -> 1
+    data.DataNumber(_) -> 1
+    data.DataRegex(_) -> 1
+    data.DataDate(_) -> 1
+    data.DataFunction(_) -> 1
+    data.DataTuple(vs) ->
+      list.map(vs, count_data)
+      |> list.fold(2, fn(acc, val) { acc + val })
+    data.DataList(vs) ->
+      list.map(vs, count_data)
+      |> list.fold(2, fn(acc, val) { acc + val })
+    data.DataCustomType(_, vs) ->
+      list.map(vs, fn(d) { count_data(pair.second(d)) })
+      |> list.fold(2, fn(acc, val) { acc + val })
+    data.DataDict(vs) ->
+      list.map(vs, fn(d) { count_data(pair.second(d)) })
+      |> list.fold(2, fn(acc, val) { acc + val })
+    data.DataSet(vs) ->
+      list.map(vs, fn(d) { count_data(d) })
+      |> list.fold(2, fn(acc, val) { acc + val })
+    data.DataObject(_, vs) ->
+      list.map(vs, fn(d) { count_data(pair.second(d)) })
+      |> list.fold(2, fn(acc, val) { acc + val })
+  }
+}
+
 fn view_data_tuple(values: List(Data), prefix p: String, indent i: Int) {
   list.concat([
     [view_data_line(i, p, "#(", "var(--editor-fg)")],
@@ -95,11 +129,24 @@ fn view_data_tuple(values: List(Data), prefix p: String, indent i: Int) {
 }
 
 fn view_data_list(values: List(Data), prefix p: String, indent i: Int) {
-  list.concat([
-    [view_data_line(i, p, "(", "var(--editor-fg)")],
-    list.flat_map(values, view_data(_, i + 2, "")),
-    [view_data_line(i, p, ")", "var(--editor-fg)")],
-  ])
+  let open_list = view_data_line(i, p, "[", "var(--editor-fg)")
+  let close_list = fn(idt) { view_data_line(idt, "", "]", "var(--editor-fg)") }
+  case list.is_empty(values) {
+    True -> [h.div([s.flex()], [open_list, close_list(0)])]
+    False ->
+      list.concat([
+        [open_list],
+        list.flat_map(values, view_data(_, i + 2, "")),
+        [close_list(i)],
+      ])
+  }
+}
+
+fn display_parenthesis(should_display, p) {
+  case should_display {
+    True -> p
+    False -> ""
+  }
 }
 
 fn view_data_custom_type(
@@ -108,23 +155,67 @@ fn view_data_custom_type(
   prefix p: String,
   indent i: Int,
 ) {
-  list.concat([
-    [view_data_line(i, p, name <> "(", "var(--custom-type)")],
-    list.flat_map(values, fn(data) {
-      let prefix = option.unwrap(pair.first(data), "")
-      view_data(pair.second(data), i + 2, prefix)
-    }),
-    [view_data_line(i, p, ")", "var(--custom-type)")],
-  ])
+  let open_type = fn(display_paren) {
+    let paren = display_parenthesis(display_paren, "(")
+    view_data_line(i, p, name <> paren, "var(--custom-type)")
+  }
+  let close_type = fn(idt, display_paren) {
+    let paren = display_parenthesis(display_paren, ")")
+    view_data_line(idt, "", paren, "var(--custom-type)")
+  }
+  let body_type = fn(inline) {
+    let #(f, e) = case inline {
+      False -> #(0, 0)
+      True -> #(i, i + 2)
+    }
+    list.concat([
+      [open_type(True)],
+      list.flat_map(values, fn(data) {
+        let prefix = option.unwrap(pair.first(data), "")
+        view_data(pair.second(data), e, prefix)
+      }),
+      [close_type(f, True)],
+    ])
+  }
+  case values {
+    [_, _, ..] -> body_type(True)
+    [_, ..] -> {
+      let v =
+        list.fold(values, 0, fn(acc, d) {
+          case acc > 2 {
+            True -> acc
+            False -> {
+              let data = count_data(pair.second(d))
+              data + acc
+            }
+          }
+        })
+      case v > 2 {
+        True -> body_type(True)
+        False -> [h.div([s.flex()], body_type(False))]
+      }
+    }
+    [] -> [h.div([s.flex()], [open_type(False), close_type(0, False)])]
+  }
 }
 
 fn view_data_dict(values: List(#(Data, Data)), prefix p: String, indent i: Int) {
   list.concat([
-    [view_data_line(i, p, "//js dict.from_list(", "var(--editor-fg)")],
+    [view_data_line(i, p, "//js dict.from_list([", "var(--editor-fg)")],
     list.flat_map(values, fn(data) {
-      view_data(pair.second(data), i + 2, data.stringify(pair.first(data)))
+      [
+        h.div(
+          [s.flex()],
+          list.concat([
+            view_data(pair.first(data), i + 2, "#("),
+            view_data(pair.second(data), 0, ", "),
+            [h.div([s.text_color("var(--bool)")], [h.text(")")])],
+            [h.text(",")],
+          ]),
+        ),
+      ]
     }),
-    [view_data_line(i, p, ")", "var(--editor-fg)")],
+    [view_data_line(i, "", "])", "var(--editor-fg)")],
   ])
 }
 

@@ -50,13 +50,9 @@ export function inspect(v) {
 }
 
 function inspectDict(map) {
-  return new DataDict(
-    List.fromArray(
-      Object.entries(map).map((value, key) => {
-        return [inspect(key), inspect(value)]
-      })
-    )
-  )
+  const data = []
+  map.forEach((value, key) => data.push([inspect(key), inspect(value)]))
+  return new DataDict(List.fromArray(data))
 }
 
 function inspectObject(v) {
