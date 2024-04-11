@@ -3,8 +3,8 @@ import gleam/string
 import lustre/element/html
 import sketch
 import sketch/size.{px}
-import grille_pain/model/toast.{type Level, type Toast}
-import grille_pain/view/colors
+import grille_pain/internals/data/toast.{type Level, type Toast}
+import grille_pain/internals/view/colors
 
 pub fn view(toast: Toast) {
   html.div(

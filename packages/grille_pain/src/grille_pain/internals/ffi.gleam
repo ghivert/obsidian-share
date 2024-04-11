@@ -1,5 +1,5 @@
+import grille_pain/internals/data/msg.{type Msg}
 import lustre.{type Action, type ClientSpa}
-import grille_pain/types.{type Msg}
 
 pub type Dispatch =
   fn(Action(Msg, ClientSpa)) -> Nil

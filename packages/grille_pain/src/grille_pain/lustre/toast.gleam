@@ -1,5 +1,5 @@
-import lustre/effect
 import grille_pain/toast
+import lustre/effect
 
 fn dispatch(content: String, grille_pain: fn(String) -> Nil) {
   use _dispatch <- effect.from()

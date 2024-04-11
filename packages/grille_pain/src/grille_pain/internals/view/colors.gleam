@@ -1,7 +1,7 @@
-import grille_pain/ffi
-import grille_pain/model/toast.{
+import grille_pain/internals/data/toast.{
   type Level, Error, Info, Standard, Success, Warning,
 }
+import grille_pain/internals/ffi
 
 pub const info = "#3498db"
 

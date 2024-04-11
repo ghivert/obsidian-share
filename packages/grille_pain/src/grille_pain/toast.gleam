@@ -1,9 +1,9 @@
-import lustre
-import grille_pain/ffi
-import grille_pain/model/toast.{
+import grille_pain/internals/data/msg.{NewToast}
+import grille_pain/internals/data/toast.{
   type Level, Error, Info, Standard, Success, Warning,
 }
-import grille_pain/types.{NewToast}
+import grille_pain/internals/ffi
+import lustre
 
 fn dispatch_toast(content: String, level: Level) {
   let grille_pain_dispatch = ffi.dispatcher()

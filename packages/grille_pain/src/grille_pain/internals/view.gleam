@@ -2,17 +2,19 @@ import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/string
+import grille_pain/internals/data/model.{type Model, Model}
+import grille_pain/internals/data/msg.{
+  type Msg, HideToast, ResumeToast, StopToast,
+}
+import grille_pain/internals/data/toast.{type Level, type Toast}
+import grille_pain/internals/view/colors
+import grille_pain/internals/view/progress_bar
 import lustre/attribute
 import lustre/element
 import lustre/element/html
 import lustre/event
 import sketch
 import sketch/size.{px}
-import grille_pain/model/model.{type Model, Model}
-import grille_pain/model/toast.{type Level, type Toast}
-import grille_pain/types.{type Msg, HideToast, ResumeToast, StopToast}
-import grille_pain/view/colors
-import grille_pain/view/progress_bar
 
 pub fn view(model: Model) {
   let Model(toasts, _, _) = model

@@ -4,17 +4,17 @@ import gleam/list
 import gleam/option
 import gleam/pair
 import gleam/result
+import grille_pain/internals/data/model.{type Model, Model}
+import grille_pain/internals/data/msg.{type Msg} as t
+import grille_pain/internals/ffi
+import grille_pain/internals/lustre/schedule.{schedule}
+import grille_pain/internals/view.{view}
+import grille_pain/options.{type Options}
 import lustre
 import lustre/effect
 import sketch
 import sketch/options as sketch_options
 import tardis
-import grille_pain/ffi
-import grille_pain/lustre/schedule.{schedule}
-import grille_pain/model/model.{type Model, Model}
-import grille_pain/options.{type Options}
-import grille_pain/types.{type Msg} as t
-import grille_pain/view.{view}
 
 pub fn setup(opts: Options) {
   ffi.create_node()
