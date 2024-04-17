@@ -11,10 +11,10 @@ repository = {type = "github", user = "pta2002", repo = "gleam-radiate"}
 # links = [{ title = "Website", href = "https://gleam.run" }]
 
 [dependencies]
-filespy = "~> 0.3"
-gleam_otp = "~> 0.10"
-gleam_stdlib = "~> 0.34 or ~> 1.0"
-shellout = "~> 1.5"
+filespy = ">= 0.4.0 and < 1.0.0"
+gleam_otp = ">= 0.10.0 and < 1.0.0"
+gleam_stdlib = ">= 0.36.0 and < 1.0.0"
+shellout = ">= 1.6.0 and < 2.0.0"
 
 [dev-dependencies]
-gleeunit = "~> 1.0"
+gleeunit = ">= 1.1.2 and < 2.0.0"

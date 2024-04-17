@@ -87,7 +87,8 @@ pub fn create_model_updater(
       effect.from(fn(_) {
         model
         |> dynamic.from()
-        |> runtime.UpdateModel()
+        |> runtime.ForceModel()
+        |> runtime.Debug()
         |> dynamic.unsafe_coerce(dispatcher)
       })
     }

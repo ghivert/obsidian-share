@@ -12,8 +12,9 @@ import lustre/effect
 import lustre/element as el
 import lustre/element/html as h
 import lustre/event
-import sketch
+import sketch/lustre as sketch
 import sketch/options as sketch_options
+import tardis/error
 import tardis/internals/data/colors
 import tardis/internals/data/debugger as debugger_
 import tardis/internals/data/model.{type Model, Model}
@@ -46,22 +47,27 @@ pub fn activate(result: Result(fn(Action(a, b)) -> Nil, c), tardis: Tardis) {
   dispatch
 }
 
+fn start_lustre(lustre_root, application) {
+  application
+  |> lustre.start(lustre_root, Nil)
+  |> result.map_error(error.LustreError)
+}
+
+fn start_sketch(root) {
+  // Attach the StyleSheet to the Shadow DOM.
+  let setup = sketch.setup(sketch_options.shadow(root))
+  use error <- result.map_error(setup)
+  io.debug("Unable to start sketch. Check your configuration.")
+  io.debug(error)
+  error.SketchError(error)
+}
+
 pub fn setup() {
   let #(shadow_root, lustre_root) = setup.mount_shadow_node()
-
-  // Attach the StyleSheet to the Shadow DOM.
-  let renderer =
-    sketch_options.shadow(shadow_root)
-    |> sketch.lustre_setup()
-
-  renderer
-  |> result.map(fn(r) { lustre.application(init, update, r(view)) })
-  |> result.map_error(fn(error) {
-    io.debug("Unable to start sketch. Check your configuration.")
-    io.debug(error)
-    lustre.NotErlang
-  })
-  |> result.then(lustre.start(_, lustre_root, Nil))
+  start_sketch(shadow_root)
+  |> result.map(sketch.compose(view, _))
+  |> result.map(lustre.application(init, update, _))
+  |> result.try(start_lustre(lustre_root, _))
   |> result.map(fn(dispatch) { Instance(dispatch) })
 }
 
@@ -98,13 +104,11 @@ fn update(model: Model, msg: Msg) {
         model.debuggers
         |> list.filter_map(fn(d_) {
           let d = pair.second(d_)
-          d.steps
-          |> list.first()
-          |> result.then(fn(item) {
-            d.dispatcher
-            |> option.map(function.apply1(_, item.model))
-            |> option.to_result(Nil)
-          })
+          let fst_step = list.first(d.steps)
+          use step <- result.try(fst_step)
+          d.dispatcher
+          |> option.map(function.apply1(_, step.model))
+          |> option.to_result(Nil)
         })
         |> effect.batch()
 
@@ -129,7 +133,7 @@ fn update(model: Model, msg: Msg) {
       let model_effect =
         model.debuggers
         |> debugger_.get(debugger_)
-        |> result.then(fn(d) {
+        |> result.try(fn(d) {
           d.dispatcher
           |> option.map(function.apply1(_, item.model))
           |> option.to_result(Nil)
@@ -177,6 +181,29 @@ fn on_debugger_input(content) {
   msg.SelectDebugger(content)
 }
 
+fn color_scheme_selector(model: Model) {
+  case model.opened {
+    False -> el.none()
+    True ->
+      h.select([event.on_input(on_cs_input), s.select_cs()], {
+        use item <- list.map(colors.themes())
+        let as_s = colors.cs_to_string(item)
+        let selected = model.color_scheme == item
+        h.option([a.value(as_s), a.selected(selected)], as_s)
+      })
+  }
+}
+
+fn restart_button(model: Model) {
+  case model.frozen, model.selected_debugger {
+    True, Some(debugger_) ->
+      h.button([s.select_cs(), event.on_click(msg.Restart(debugger_))], [
+        h.text("Restart"),
+      ])
+    _, _ -> el.none()
+  }
+}
+
 fn view(model: Model) {
   let color_scheme_class = colors.get_color_scheme_class(model.color_scheme)
   let #(panel, header, button_txt) = select_panel_options(model.opened)
@@ -193,38 +220,17 @@ fn view(model: Model) {
       h.div([header], [
         h.div([s.flex(), s.debugger_title()], [
           h.div([], [h.text("Debugger")]),
-          case model.opened {
-            False -> el.none()
-            True ->
-              h.select([event.on_input(on_cs_input), s.select_cs()], {
-                use item <- list.map(colors.themes())
-                let as_s = colors.cs_to_string(item)
-                let selected = model.color_scheme == item
-                h.option([a.value(as_s), a.selected(selected)], as_s)
-              })
-          },
-          case model.frozen, model.selected_debugger {
-            True, Some(debugger_) ->
-              h.button([s.select_cs(), event.on_click(msg.Restart(debugger_))], [
-                h.text("Restart"),
-              ])
-            _, _ -> el.none()
-          },
+          color_scheme_selector(model),
+          restart_button(model),
         ]),
         case debugger_ {
           Error(_) -> el.none()
           Ok(debugger_) ->
             h.div([s.actions_section()], [
               h.select([event.on_input(on_debugger_input), s.select_cs()], {
-                list.filter(model.debuggers, fn(debugger_) {
-                  let steps = pair.second(debugger_).steps
-                  !list.is_empty(steps)
-                })
-                |> list.map(fn(i) {
-                  let #(item, _) = i
-                  let selected = model.selected_debugger == Some(item)
-                  h.option([a.value(item), a.selected(selected)], item)
-                })
+                use #(item, _) <- list.map(model.keep_active_debuggers(model))
+                let selected = model.selected_debugger == Some(item)
+                h.option([a.value(item), a.selected(selected)], item)
               }),
               h.div([], [h.text(int.to_string(debugger_.count - 1) <> " Steps")]),
               h.button([s.toggle_button(), event.on_click(msg.ToggleOpen)], [

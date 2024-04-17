@@ -9,15 +9,15 @@ version = "1.0.0"
 typescript_declarations = true
 
 [dependencies]
-gleam_javascript = "~> 0.8"
-gleam_stdlib = "~> 0.34 or ~> 1.0"
+gleam_javascript = ">= 0.8.0 and < 1.0.0"
+gleam_stdlib = ">= 0.36.0 and < 1.0.0"
 grille_pain = {path = "../../packages/grille_pain"}
 layout = {path = "../../packages/layout"}
-lustre = {path = "../../../lustre"}
-lustre_http = "~> 0.5"
-plinth = {path = "../../../plinth"}
-sketch = {path = "../../../sketch"}
+lustre = ">= 4.1.8 and < 5.0.0"
+lustre_http = ">= 0.5.2 and < 1.0.0"
+plinth = ">= 0.2.0 and < 1.0.0"
+sketch = ">= 2.0.0 and < 3.0.0"
 tardis = {path = "../../packages/tardis"}
 
 [dev-dependencies]
-gleeunit = "~> 1.0"
+gleeunit = ">= 1.1.2 and < 2.0.0"

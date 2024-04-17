@@ -2,12 +2,12 @@ name = "backend"
 version = "1.0.0"
 
 [dependencies]
-gleam_erlang = "~> 0.25"
-gleam_http = "~> 3.6"
-gleam_json = "~> 1.0"
-gleam_stdlib = "~> 0.34 or ~> 1.0"
-mist = "1.0.0-rc2"
+gleam_erlang = ">= 0.25.0 and < 1.0.0"
+gleam_http = ">= 3.6.0 and < 4.0.0"
+gleam_json = ">= 1.0.0 and < 2.0.0"
+gleam_stdlib = ">= 0.36.0 and < 1.0.0"
+mist = ">= 1.0.0 and < 2.0.0"
 radiate = {path = "../../packages/gleam-radiate"}
 
 [dev-dependencies]
-gleeunit = "~> 1.0"
+gleeunit = ">= 1.1.2 and < 2.0.0"
