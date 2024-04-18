@@ -1,1 +1,1 @@
-pub opaque type App
+pub type App

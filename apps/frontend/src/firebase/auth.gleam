@@ -4,7 +4,7 @@ import gleam/javascript/promise.{type Promise}
 import gleam/option.{type Option}
 import gleam/result
 
-pub opaque type Auth
+pub type Auth
 
 pub type AuthError {
   Decoding(List(DecodeError))

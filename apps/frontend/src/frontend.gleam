@@ -1,10 +1,11 @@
+import gleam/result
 import grille_pain
 import grille_pain/lustre/toast
 import grille_pain/options
 import lustre
 import lustre/effect
 import lustre/update
-import sketch
+import sketch/lustre as sketch
 import sketch/options as sketch_options
 import tardis
 import types
@@ -22,11 +23,12 @@ pub fn main() {
 
   let assert Ok(render) =
     sketch_options.document()
-    |> sketch.lustre_setup()
+    |> sketch.setup()
+    |> result.map(sketch.compose(main_layout, _))
 
   let assert Ok(_) =
     fn(_) { #(types.init(), effect.none()) }
-    |> lustre.application(update, render(main_layout))
+    |> lustre.application(update, render)
     |> tardis.wrap(with: main)
     |> lustre.start("#app", Nil)
     |> tardis.activate(with: main)
