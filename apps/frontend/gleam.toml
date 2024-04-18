@@ -17,7 +17,7 @@ lustre = ">= 4.1.8 and < 5.0.0"
 lustre_http = ">= 0.5.2 and < 1.0.0"
 plinth = ">= 0.2.0 and < 1.0.0"
 sketch = ">= 2.0.0 and < 3.0.0"
-tardis = {path = "../../packages/tardis"}
+tardis = {path = "../../../tardis"}
 
 [dev-dependencies]
 gleeunit = ">= 1.1.2 and < 2.0.0"

@@ -1,14 +1,14 @@
-import views/layout.{main_layout}
+import grille_pain
+import grille_pain/lustre/toast
+import grille_pain/options
 import lustre
 import lustre/effect
 import lustre/update
 import sketch
 import sketch/options as sketch_options
-import grille_pain
-import grille_pain/lustre/toast
-import grille_pain/options
 import tardis
 import types
+import views/layout.{main_layout}
 
 pub fn main() {
   let assert Ok(debugger_) = tardis.setup()
@@ -27,9 +27,9 @@ pub fn main() {
   let assert Ok(_) =
     fn(_) { #(types.init(), effect.none()) }
     |> lustre.application(update, render(main_layout))
-    |> tardis.wrap(main)
+    |> tardis.wrap(with: main)
     |> lustre.start("#app", Nil)
-    |> tardis.activate(main)
+    |> tardis.activate(with: main)
 }
 
 fn update(model, msg) {

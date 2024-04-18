@@ -12,7 +12,7 @@ import grille_pain/internals/view.{view}
 import grille_pain/options.{type Options}
 import lustre
 import lustre/effect
-import sketch
+import sketch/lustre as sketch
 import sketch/options as sketch_options
 import tardis
 
@@ -27,12 +27,13 @@ pub fn setup(opts: Options) {
 
   let render =
     sketch_options.node()
-    |> sketch.lustre_setup()
-    |> result.unwrap(function.identity)
+    |> sketch.setup()
+    |> result.map(sketch.compose(view, _))
+    |> result.unwrap(view)
 
   let dispatcher =
     fn(_) { #(model.new(opts.timeout), effect.none()) }
-    |> lustre.application(update, render(view))
+    |> lustre.application(update, render)
     |> wrapper()
     |> lustre.start("#grille-pain", Nil)
     |> activate()

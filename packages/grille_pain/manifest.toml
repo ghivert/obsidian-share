@@ -14,15 +14,15 @@ packages = [
   { name = "ranger", version = "1.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "1566C272B1D141B3BBA38B25CB761EF56E312E79EC0E2DFD4D3C19FB0CC1F98C" },
   { name = "scheduler", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], source = "local", path = "../scheduler" },
   { name = "sketch", version = "2.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre", "plinth"], otp_app = "sketch", source = "hex", outer_checksum = "2FE8458F79F2A92267A70F9230151A92038554C19C6948B01B7EAAE0B888B9BB" },
-  { name = "tardis", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre", "plinth", "sketch"], source = "local", path = "../tardis" },
+  { name = "tardis", version = "0.1.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "lustre", "plinth", "sketch"], source = "local", path = "../../../tardis" },
   { name = "thoas", version = "0.4.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "4918D50026C073C4AB1388437132C77A6F6F7C8AC43C60C13758CC0ADCE2134E" },
 ]
 
 [requirements]
 birl = { version = ">= 1.6.1 and < 2.0.0" }
 gleam_stdlib = { version = ">= 0.36.0 and < 1.0.0" }
-gleeunit = { version = ">= 1.1.2 and < 2.0.0"}
+gleeunit = { version = ">= 1.1.2 and < 2.0.0" }
 lustre = { version = ">= 4.1.8 and < 5.0.0" }
 scheduler = { path = "../scheduler" }
 sketch = { version = ">= 2.0.0 and < 3.0.0" }
-tardis = { path = "../tardis" }
+tardis = { path = "../../../tardis" }

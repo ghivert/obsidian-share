@@ -2,7 +2,7 @@ import gleam/option.{type Option, None, Some}
 import tardis
 
 pub type Options {
-  Options(timeout: Int, debug: Option(tardis.Instance))
+  Options(timeout: Int, debug: Option(tardis.Tardis))
 }
 
 pub fn default() -> Options {
